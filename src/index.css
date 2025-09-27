@@ -248,6 +248,15 @@
   );
 }
 
+/* Кастомная ширина и высота для модалки превью изображения */
+.image-viewer-dialog-content {
+  width: 1024px !important;
+  max-width: 1024px !important;
+  min-width: 1024px !important;
+  height: 80vh !important;
+  max-height: 80vh !important;
+}
+
 .dark .gradient-bg-animated {
   background: linear-gradient(
     -45deg,

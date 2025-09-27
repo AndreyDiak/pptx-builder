@@ -60,6 +60,8 @@ export const CreateProjectDialogForm = ({
     folder: "backgrounds",
   });
 
+  const bgHref = propsDefaultValues?.bg_href;
+
   const manager = useForm<FormValues>({
     defaultValues: {
       ...defaultValues,
@@ -70,7 +72,7 @@ export const CreateProjectDialogForm = ({
         ? new Date(propsDefaultValues?.deadline)
         : undefined,
       // Устанавливаем bgFileFromBucket если есть существующее изображение
-      bgFileFromBucket: propsDefaultValues?.bg_href || null,
+      // bgFileFromBucket: propsDefaultValues?.bg_href || null,
     },
   });
   const deadlineEnabled = manager.watch("deadlineEnabled");
@@ -79,12 +81,10 @@ export const CreateProjectDialogForm = ({
     async ({ data }: { data: FormValues }) => {
       let bgHref = propsDefaultValues?.bg_href || null;
 
-      console.log("Данные формы:", { data });
-      console.log("bgFile:", data.bgFile, typeof data.bgFile);
-
       // Обрабатываем файл
-      if (data.bgFile === null) {
+      if (data.bgFile === null || data.bgFile === "") {
         // Удаляем изображение
+        console.log("Удаляем изображение, устанавливаем bgHref = null");
         bgHref = null;
       } else if (data.bgFile instanceof FileList && data.bgFile.length > 0) {
         // Новый файл - загружаем
@@ -218,15 +218,19 @@ export const CreateProjectDialogForm = ({
           useController
           help="Не рекомендуется использовать изображения с весом больше 5 МБ"
         >
-          <FileInput
-            accept="image/*"
-            maxFiles={1}
-            placeholder="Перетащите изображение или загрузите"
-            showFileNames={true}
-            existingImageUrl={propsDefaultValues?.bg_href || undefined}
-            bucket="photos"
-            folder="backgrounds"
-          />
+          {(props) => (
+            <FileInput
+              {...props}
+              accept="image/*"
+              maxFiles={1}
+              placeholder="Перетащите изображение или загрузите"
+              showFileNames={true}
+              existingImageUrl={propsDefaultValues?.bg_href || undefined}
+              bucket="photos"
+              folder="backgrounds"
+              defaultTab="upload"
+            />
+          )}
         </FormField>
         <FormField
           name="deadlineEnabled"

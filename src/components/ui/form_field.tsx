@@ -9,7 +9,7 @@ interface FormFieldProps {
   label?: string;
   required?: boolean;
   className?: string;
-  children: ReactElement;
+  children: ReactElement | ((props: any) => ReactElement);
   errorMessage?: string;
   useController?: boolean; // Новый пропс для указания использования Controller
   help?: string; // Описание/подсказка для поля
@@ -53,19 +53,30 @@ export const FormField = ({
               : false,
           }}
           render={({ field }) => {
+            const fieldProps = {
+              ...field,
+              id: name,
+              "aria-invalid": hasError,
+              "aria-describedby": hasError
+                ? `${name}-error`
+                : help
+                ? `${name}-help`
+                : undefined,
+              className: cn(
+                hasError && "border-destructive focus:ring-destructive"
+              ),
+            };
+
+            if (typeof children === "function") {
+              return children(fieldProps);
+            }
+
             const enhancedChildren = isValidElement(children)
               ? cloneElement(children, {
-                  ...field,
-                  id: name,
-                  "aria-invalid": hasError,
-                  "aria-describedby": hasError
-                    ? `${name}-error`
-                    : help
-                    ? `${name}-help`
-                    : undefined,
+                  ...fieldProps,
                   className: cn(
                     (children.props as any)?.className,
-                    hasError && "border-destructive focus:ring-destructive"
+                    fieldProps.className
                   ),
                 } as any)
               : children;
@@ -104,25 +115,35 @@ export const FormField = ({
   // Извлекаем только DOM-совместимые пропсы из регистрации
   const { ref, onChange, onBlur, name: fieldName } = registration;
 
-  const enhancedChildren = isValidElement(children)
-    ? cloneElement(children, {
-        id: name,
-        ref,
-        onChange,
-        onBlur,
-        name: fieldName,
-        "aria-invalid": hasError,
-        "aria-describedby": hasError
-          ? `${name}-error`
-          : help
-          ? `${name}-help`
-          : undefined,
-        className: cn(
-          (children.props as any)?.className,
-          hasError && "border-destructive focus:ring-destructive"
-        ),
-      } as any)
-    : children;
+  const fieldProps = {
+    id: name,
+    ref,
+    onChange,
+    onBlur,
+    name: fieldName,
+    "aria-invalid": hasError,
+    "aria-describedby": hasError
+      ? `${name}-error`
+      : help
+      ? `${name}-help`
+      : undefined,
+    className: cn(hasError && "border-destructive focus:ring-destructive"),
+  };
+
+  let enhancedChildren;
+  if (typeof children === "function") {
+    enhancedChildren = children(fieldProps);
+  } else {
+    enhancedChildren = isValidElement(children)
+      ? cloneElement(children, {
+          ...fieldProps,
+          className: cn(
+            (children.props as any)?.className,
+            fieldProps.className
+          ),
+        } as any)
+      : children;
+  }
 
   return (
     <div className={cn("space-y-2", className)}>
