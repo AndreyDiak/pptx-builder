@@ -1,6 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 // import type { Project } from "../../types/project";
-import { deleteProject } from "@/actions/project";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm_dialog";
 import { DateDisplay } from "@/components/ui/date_display";
@@ -21,10 +20,11 @@ export const ProjectPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const { data: project, pending } = useProject(
-    Number(id),
-    !id || id === "new"
-  );
+  const {
+    data: project,
+    pending,
+    onDelete,
+  } = useProject(Number(id), !id || id === "new");
 
   if (pending) {
     return <ProjectPendingDisplay />;
@@ -41,7 +41,7 @@ export const ProjectPage = () => {
 
   const handleDelete = async () => {
     try {
-      await deleteProject(project.id);
+      await onDelete();
       toast.success("Проект успешно удален");
       navigate("/");
     } catch {
@@ -81,11 +81,9 @@ export const ProjectPage = () => {
           </Button>
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" onClick={() => setOpen(true)}>
-                Редактировать
-              </Button>
+              <Button size="sm">Редактировать</Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-h-[85vh] w-[540px] overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
               <CreateProjectDialogForm
                 defaultValues={project || undefined}
                 onSuccess={() => setOpen(false)}
@@ -107,8 +105,7 @@ export const ProjectPage = () => {
         </div>
       </div>
       <Separator />
-      <div className="flex-1">
-        {/* project info */}
+      <div className="w-[500px]">
         <div className="mt-6">
           <div className="text-muted-foreground text-sm mb-4">
             {project.description}
@@ -144,6 +141,19 @@ export const ProjectPage = () => {
             labelWidth={180}
             className="max-w-md"
           />
+          <Separator className="my-4" />
+          {project.bg_href && (
+            <div>
+              <h2 className="text-base font-medium mb-2">
+                Титульное изображение
+              </h2>
+              <img
+                src={project.bg_href}
+                alt={project.name}
+                className="object-cover w-xl rounded-2xl border border-blue-[var(--border)]"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

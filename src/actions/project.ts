@@ -20,4 +20,3 @@ export function updateProject(id: number, payload: Partial<ProjectInsert>) {
 export function deleteProject(id: number) {
   return supabase.from('projects').delete().eq('id', id);
 }
-

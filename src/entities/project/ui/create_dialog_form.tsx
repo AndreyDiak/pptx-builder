@@ -7,12 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FileInput } from "@/components/ui/file_input";
 import { Form } from "@/components/ui/form";
 import { FormField } from "@/components/ui/form_field";
 import { FormSubmitButton } from "@/components/ui/form_submit_button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useFile } from "@/shared/hooks/use_file";
 import { useProject } from "@/shared/hooks/use_project";
 import { Fragment, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -30,12 +32,14 @@ interface FormValues extends Omit<ProjectInsert, "deadline"> {
   description?: string | null;
   deadlineEnabled: boolean;
   deadline?: Date;
+  bgFile?: FileList | string | null; // Может быть FileList, URL строкой или null
 }
 
 const defaultValues: FormValues = {
   name: "",
   deadlineEnabled: false,
   deadline: undefined,
+  bgFile: null,
 };
 
 export const CreateProjectDialogForm = ({
@@ -51,6 +55,11 @@ export const CreateProjectDialogForm = ({
     !edit
   );
 
+  const { uploadFile } = useFile({
+    bucket: "photos",
+    folder: "backgrounds",
+  });
+
   const manager = useForm<FormValues>({
     defaultValues: {
       ...defaultValues,
@@ -60,12 +69,43 @@ export const CreateProjectDialogForm = ({
       deadline: propsDefaultValues?.deadline
         ? new Date(propsDefaultValues?.deadline)
         : undefined,
+      // Устанавливаем bgFileFromBucket если есть существующее изображение
+      bgFileFromBucket: propsDefaultValues?.bg_href || null,
     },
   });
   const deadlineEnabled = manager.watch("deadlineEnabled");
 
   const handleSubmit = useCallback(
     async ({ data }: { data: FormValues }) => {
+      let bgHref = propsDefaultValues?.bg_href || null;
+
+      console.log("Данные формы:", { data });
+      console.log("bgFile:", data.bgFile, typeof data.bgFile);
+
+      // Обрабатываем файл
+      if (data.bgFile === null) {
+        // Удаляем изображение
+        bgHref = null;
+      } else if (data.bgFile instanceof FileList && data.bgFile.length > 0) {
+        // Новый файл - загружаем
+        const file = data.bgFile[0];
+        const uploadedUrl = await uploadFile(file);
+        if (uploadedUrl) {
+          bgHref = uploadedUrl;
+        } else {
+          toast.error("Не удалось загрузить файл");
+          return;
+        }
+      } else if (
+        typeof data.bgFile === "string" &&
+        data.bgFile.startsWith("http")
+      ) {
+        // URL из БД
+        bgHref = data.bgFile;
+      }
+
+      console.log("Финальное значение bgHref:", bgHref, typeof bgHref);
+
       const projectData: ProjectInsert = {
         name: data.name,
         description: data.description,
@@ -75,6 +115,7 @@ export const CreateProjectDialogForm = ({
         updated_at: new Date().toISOString(),
         size_x: data.size_x,
         size_y: data.size_y,
+        bg_href: bgHref,
       };
 
       try {
@@ -95,7 +136,7 @@ export const CreateProjectDialogForm = ({
         toast.error("Не удалось обновить проект");
       }
     },
-    [edit, propsDefaultValues, manager, onSuccess]
+    [edit, propsDefaultValues, manager, onSuccess, uploadFile]
   );
 
   // Автоматически устанавливаем текущую дату при включении deadlineEnabled только для новых проектов
@@ -113,7 +154,7 @@ export const CreateProjectDialogForm = ({
   return (
     <Fragment>
       <DialogHeader>
-        <DialogTitle>
+        <DialogTitle className="text-2xl font-semibold">
           {edit ? "Редактировать проект" : "Создать проект"}
         </DialogTitle>
         <DialogDescription className="text-muted-foreground mt-2">
@@ -147,6 +188,7 @@ export const CreateProjectDialogForm = ({
           name="size_x"
           label="Количество треков по горизонтали"
           required
+          help="Определяет количество колонок в сетке презентации (от 1 до 10)"
         >
           <Input
             type="number"
@@ -160,6 +202,7 @@ export const CreateProjectDialogForm = ({
           name="size_y"
           label="Количество треков по вертикали"
           required
+          help="Определяет количество строк в сетке презентации (от 1 до 10)"
         >
           <Input
             type="number"
@@ -169,7 +212,22 @@ export const CreateProjectDialogForm = ({
             className="h-12 text-base"
           />
         </FormField>
-
+        <FormField
+          name="bgFile"
+          label="Фоновое изображение"
+          useController
+          help="Не рекомендуется использовать изображения с весом больше 5 МБ"
+        >
+          <FileInput
+            accept="image/*"
+            maxFiles={1}
+            placeholder="Перетащите изображение или загрузите"
+            showFileNames={true}
+            existingImageUrl={propsDefaultValues?.bg_href || undefined}
+            bucket="photos"
+            folder="backgrounds"
+          />
+        </FormField>
         <FormField
           name="deadlineEnabled"
           label="Установить дедлайн"

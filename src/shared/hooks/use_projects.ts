@@ -4,7 +4,7 @@ import { useHttp } from "./use_http";
 
 export function useProjects() {
 	
-	const httpResult = useHttp<Project[]>({
+	return useHttp<Project[]>({
 		defaultValue: [],
 		fetcher: getProjects,
 		cache: {
@@ -14,7 +14,5 @@ export function useProjects() {
 		}
 	});
 
-	return {
-		...httpResult,
-	};
+	
 }

@@ -12,6 +12,7 @@ interface FormFieldProps {
   children: ReactElement;
   errorMessage?: string;
   useController?: boolean; // Новый пропс для указания использования Controller
+  help?: string; // Описание/подсказка для поля
 }
 
 export const FormField = ({
@@ -22,6 +23,7 @@ export const FormField = ({
   children,
   errorMessage,
   useController = false,
+  help,
 }: FormFieldProps) => {
   const {
     register,
@@ -56,7 +58,11 @@ export const FormField = ({
                   ...field,
                   id: name,
                   "aria-invalid": hasError,
-                  "aria-describedby": hasError ? `${name}-error` : undefined,
+                  "aria-describedby": hasError
+                    ? `${name}-error`
+                    : help
+                    ? `${name}-help`
+                    : undefined,
                   className: cn(
                     (children.props as any)?.className,
                     hasError && "border-destructive focus:ring-destructive"
@@ -67,6 +73,11 @@ export const FormField = ({
             return enhancedChildren;
           }}
         />
+        {help && !hasError && (
+          <p id={`${name}-help`} className="text-sm text-muted-foreground">
+            {help}
+          </p>
+        )}
         {hasError && (
           <p
             id={`${name}-error`}
@@ -101,7 +112,11 @@ export const FormField = ({
         onBlur,
         name: fieldName,
         "aria-invalid": hasError,
-        "aria-describedby": hasError ? `${name}-error` : undefined,
+        "aria-describedby": hasError
+          ? `${name}-error`
+          : help
+          ? `${name}-help`
+          : undefined,
         className: cn(
           (children.props as any)?.className,
           hasError && "border-destructive focus:ring-destructive"
@@ -118,6 +133,11 @@ export const FormField = ({
         </Label>
       )}
       {enhancedChildren}
+      {help && !hasError && (
+        <p id={`${name}-help`} className="text-sm text-muted-foreground">
+          {help}
+        </p>
+      )}
       {hasError && (
         <p
           id={`${name}-error`}
