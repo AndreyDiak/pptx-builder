@@ -1,13 +1,13 @@
-import { useParams } from "react-router-dom";
-// import type { Project } from "../../types/project";
 import { Separator } from "@/components/ui/separator";
 import {
   ProjectNoDataDisplay,
   ProjectPendingDisplay,
 } from "@/entities/project";
 import { useProject } from "@/shared/hooks/use_project";
+import { useParams } from "react-router-dom";
 import { ProjectDetails } from "./_details";
 import { ProjectHeader } from "./_header";
+import { ProjectsTracks } from "./_tracks";
 
 export const ProjectPage = () => {
   const { id } = useParams();
@@ -33,7 +33,7 @@ export const ProjectPage = () => {
       <div className="grid grid-cols-[1fr_3fr] gap-4 py-4">
         {/* Project Details */}
         <ProjectDetails project={project} />
-        <div>Песни...</div>
+        <ProjectsTracks />
       </div>
     </div>
   );

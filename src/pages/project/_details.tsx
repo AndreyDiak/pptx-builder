@@ -10,7 +10,7 @@ interface Props extends ComponentProps<"div"> {
 }
 
 export const ProjectDetails = ({ project, className, ...rest }: Props) => {
-  const slidesCount = project?.slide_ids?.length ?? 0;
+  const slidesCount = project?.track_ids?.length ?? 0;
   const total = project?.size_x * project?.size_y;
 
   return (
@@ -50,7 +50,7 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
           labelWidth={180}
           className="max-w-md"
         />
-        {project.bg_href && (
+        {project.front_page_background_src && (
           <Fragment>
             <Separator className="my-4" />
             <div>
@@ -58,7 +58,7 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
                 Титульное изображение
               </h2>
               <img
-                src={project.bg_href}
+                src={project.front_page_background_src}
                 alt={project.name}
                 className="object-cover w-xl rounded-2xl border border-blue-[var(--border)]"
               />

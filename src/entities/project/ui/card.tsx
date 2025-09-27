@@ -16,7 +16,7 @@ import { Link } from "react-router-dom";
 import type { Project } from "../types";
 
 export const ProjectCard = ({ project }: { project: Project }) => {
-  const slidesCount = project.slide_ids?.length ?? 0;
+  const slidesCount = project.track_ids?.length ?? 0;
   const total = project.size_x * project.size_y;
   const progress = (slidesCount / total) * 100;
 

@@ -60,7 +60,7 @@ export const CreateProjectDialogForm = ({
     folder: "backgrounds",
   });
 
-  const bgHref = propsDefaultValues?.bg_href;
+  // const bgHref = propsDefaultValues?.bg_href;
 
   const manager = useForm<FormValues>({
     defaultValues: {
@@ -79,7 +79,7 @@ export const CreateProjectDialogForm = ({
 
   const handleSubmit = useCallback(
     async ({ data }: { data: FormValues }) => {
-      let bgHref = propsDefaultValues?.bg_href || null;
+      let bgHref = propsDefaultValues?.front_page_background_src || null;
 
       // Обрабатываем файл
       if (data.bgFile === null || data.bgFile === "") {
@@ -115,7 +115,7 @@ export const CreateProjectDialogForm = ({
         updated_at: new Date().toISOString(),
         size_x: data.size_x,
         size_y: data.size_y,
-        bg_href: bgHref,
+        front_page_background_src: bgHref,
       };
 
       try {
@@ -225,7 +225,9 @@ export const CreateProjectDialogForm = ({
               maxFiles={1}
               placeholder="Перетащите изображение или загрузите"
               showFileNames={true}
-              existingImageUrl={propsDefaultValues?.bg_href || undefined}
+              existingImageUrl={
+                propsDefaultValues?.front_page_background_src || undefined
+              }
               bucket="photos"
               folder="backgrounds"
               defaultTab="upload"
