@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-import { ProjectLayout, ProjectPage } from "./pages/project";
+import { ProjectPage } from "./pages/project";
+import { ProjectLayout } from "./pages/project/layout";
 import { ProjectsPage } from "./pages/projects";
 
 function App() {
