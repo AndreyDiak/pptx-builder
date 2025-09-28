@@ -1,5 +1,4 @@
 import { deleteFileByUrl } from "@/actions/file";
-import { AudioEditor } from "@/components/ui/audio_editor";
 import { AudioPreview } from "@/components/ui/audio_preview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,7 @@ import { formatDuration } from "@/shared/utils";
 import { Edit3, Trash } from "lucide-react";
 import { useState } from "react";
 import type { Track } from "../types";
+import { CreateTrackDialogForm } from "./create_dialog_form";
 
 export const TrackCard = ({ track }: { track: Track }) => {
   const { duration, loading, error } = useAudioDuration(track.audio_src);
@@ -22,10 +22,6 @@ export const TrackCard = ({ track }: { track: Track }) => {
   const [deleteImage, setDeleteImage] = useState(true);
 
   const { onDelete } = useTrack(track.id, true);
-
-  const handleEdit = (_startTime: number, _endTime: number) => {
-    // Здесь можно добавить логику обрезки аудио
-  };
 
   const handleDelete = async () => {
     // Удаляем файлы (функция сама обрабатывает невалидные URL)
@@ -77,10 +73,18 @@ export const TrackCard = ({ track }: { track: Track }) => {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
-                  <AudioEditor
-                    audioUrl={track.audio_src}
-                    onSave={handleEdit}
-                    onClose={() => setIsEditing(false)}
+                  <CreateTrackDialogForm
+                    projectId={track.project_id}
+                    defaultValues={{
+                      id: track.id,
+                      name: track.name,
+                      author: track.author,
+                      audio_src: track.audio_src,
+                      image_src: track.image_src,
+                      index: track.index,
+                      project_id: track.project_id,
+                    }}
+                    onSuccess={() => setIsEditing(false)}
                   />
                 </DialogContent>
               </Dialog>

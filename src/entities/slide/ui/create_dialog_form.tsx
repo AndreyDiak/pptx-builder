@@ -46,6 +46,7 @@ const defaultValues: Partial<TrackInsert> = {
 export const CreateTrackDialogForm = ({
   projectId,
   defaultValues: propsDefaultValues,
+  onSuccess,
 }: Props) => {
   const edit = !!propsDefaultValues?.id;
   const [audioFile, setAudioFile] = useState<File | null>(null);
@@ -124,7 +125,6 @@ export const CreateTrackDialogForm = ({
         const currentAudioFile = audioFileRef.current || audioFile;
         if (currentAudioFile) {
           const audioResult = await StorageService.uploadTrackAudio(
-            projectId,
             currentAudioFile
           );
           if (!audioResult) {
@@ -152,7 +152,6 @@ export const CreateTrackDialogForm = ({
             const fileList = data.image_src as FileList;
             if (fileList.length > 0) {
               const imageResult = await StorageService.uploadTrackImage(
-                projectId,
                 fileList[0]
               );
               if (!imageResult) {
@@ -188,7 +187,7 @@ export const CreateTrackDialogForm = ({
         }
 
         // Закрываем диалог
-        // onSuccess?.();
+        onSuccess?.();
       } catch (error) {
         console.error("Ошибка при создании трека:", error);
       } finally {
@@ -204,6 +203,7 @@ export const CreateTrackDialogForm = ({
       isUploading,
       isTrimming,
       trimProgress,
+      onSuccess,
     ]
   );
 
@@ -266,7 +266,7 @@ export const CreateTrackDialogForm = ({
           name="image_src"
           label="Фоновое изображение"
           useController
-          help="Не рекомендуется использовать изображения с весом больше 5 МБ"
+          help="Нельзя загружать изображения с весом больше 5 МБ"
         >
           {(props) => (
             <FileInput
@@ -298,7 +298,7 @@ export const CreateTrackDialogForm = ({
           <div className="w-full mb-3">
             <div className="flex items-center gap-2 mb-2">
               <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
-              <p className="text-sm font-medium text-[var(--primary)]">
+              <p className="text-sm text-[var(--primary)]">
                 Обрезка аудио... {Math.round(trimProgress)}%
               </p>
             </div>
@@ -306,7 +306,7 @@ export const CreateTrackDialogForm = ({
               <div
                 className="bg-[var(--primary)] h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${trimProgress}%` }}
-              ></div>
+              />
             </div>
           </div>
         )}

@@ -41,9 +41,19 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
             ],
             [
               "Готовность",
-              project.status === "editing"
-                ? `${((slidesCount / total) * 100).toFixed(0)}%`
-                : "Завершен",
+              project.status === "editing" ? (
+                <span
+                  className={cn(
+                    progressToColorMap[
+                      Math.round(((slidesCount / total) * 100) / 25) * 25
+                    ]
+                  )}
+                >
+                  {((slidesCount / total) * 100).toFixed(0)}%
+                </span>
+              ) : (
+                "Завершен"
+              ),
             ],
           ]}
           size="lg"
@@ -69,4 +79,12 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
       </div>
     </div>
   );
+};
+
+const progressToColorMap: Record<number, string> = {
+  0: "text-red-500",
+  25: "text-orange-500",
+  50: "text-yellow-500",
+  75: "bg-blue-500",
+  100: "text-green-500",
 };

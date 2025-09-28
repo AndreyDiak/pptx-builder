@@ -467,13 +467,12 @@ export class StorageService {
    * Загрузить аудиофайл для трека
    */
   static async uploadTrackAudio(
-    projectId: number,
     file: File
   ): Promise<{ path: string; url: string } | null> {
     try {
       const timestamp = Date.now();
       const fileExtension = file.name.split('.').pop();
-      const fileName = `tracks/${projectId}/${timestamp}.${fileExtension}`;
+      const fileName = `tracks/${timestamp}.${fileExtension}`;
 
       const uploadResult = await this.uploadFile('audios', {
         file,
@@ -504,13 +503,12 @@ export class StorageService {
    * Загрузить изображение для трека
    */
   static async uploadTrackImage(
-    projectId: number,
     file: File
   ): Promise<{ path: string; url: string } | null> {
     try {
       const timestamp = Date.now();
       const fileExtension = file.name.split('.').pop();
-      const fileName = `tracks/${projectId}/${timestamp}.${fileExtension}`;
+      const fileName = `tracks/${timestamp}.${fileExtension}`;
 
       const uploadResult = await this.uploadFile('photos', {
         file,

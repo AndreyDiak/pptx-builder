@@ -18,6 +18,9 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
   const [_, setOpen] = useState(false);
   const showDeadline = project.status === "editing" && project.deadline;
 
+  const completed =
+    project.track_ids?.length === project.size_x * project.size_y;
+
   const handleDelete = async () => {
     try {
       await onDelete();
@@ -68,7 +71,17 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
             />
           </DialogContent>
         </Dialog>
-
+        <ConfirmDialog
+          title="Создание презентации"
+          confirmText="Создать презентацию"
+          onConfirm={() => {
+            console.log("...");
+          }}
+        >
+          <Button size="sm" disabled={!completed}>
+            Создать презентацию
+          </Button>
+        </ConfirmDialog>
         <ConfirmDialog
           variant="destructive"
           title="Удаление проекта"
