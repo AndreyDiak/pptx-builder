@@ -8,8 +8,6 @@ import { CreateProjectDialogForm, type Project } from "@/entities/project";
 import {
   generatePresentationHTMLWithAssets,
   generatePresentationZIP,
-  testPresentationGenerator,
-  testStaticAssets,
 } from "@/services/presentationGenerator";
 import { cn } from "@/shared/utils";
 import { useState } from "react";
@@ -140,52 +138,6 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
     }
   };
 
-  const handleTestPresentation = () => {
-    try {
-      const { testProject, testTracks } = testPresentationGenerator();
-      console.log("Тестовые данные:", { testProject, testTracks });
-      toast.info("Тестовые данные созданы, проверьте консоль");
-    } catch (error) {
-      console.error("Ошибка тестирования:", error);
-      toast.error("Ошибка тестирования");
-    }
-  };
-
-  const handleTestNavigation = async () => {
-    try {
-      const { testProject, testTracks } = testPresentationGenerator();
-
-      // Создаем тестовую HTML презентацию
-      const htmlContent = await generatePresentationHTMLWithAssets({
-        project: testProject,
-        tracks: testTracks,
-      });
-
-      // Открываем в новой вкладке для тестирования
-      const blob = new Blob([htmlContent], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-
-      toast.info("Тестовая презентация открыта в новой вкладке");
-    } catch (error) {
-      console.error("Ошибка тестирования навигации:", error);
-      toast.error("Ошибка тестирования навигации");
-    }
-  };
-
-  const handleTestStaticAssets = async () => {
-    try {
-      const staticAssets = await testStaticAssets();
-      console.log("Статические ассеты:", staticAssets);
-      toast.info(
-        `Загружено ${staticAssets.size} статических ассетов, проверьте консоль`
-      );
-    } catch (error) {
-      console.error("Ошибка тестирования статических ассетов:", error);
-      toast.error("Ошибка тестирования статических ассетов");
-    }
-  };
-
   return (
     <div
       className={cn(
@@ -235,27 +187,7 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
         >
           {isCreatingPresentation ? "Создание..." : "Создать презентацию"}
         </Button>
-        {process.env.NODE_ENV === "development" && (
-          <>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleTestPresentation}
-            >
-              Тест
-            </Button>
-            <Button size="sm" variant="outline" onClick={handleTestNavigation}>
-              Тест навигации
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleTestStaticAssets}
-            >
-              Тест ассетов
-            </Button>
-          </>
-        )}
+
         <ConfirmDialog
           variant="destructive"
           title="Удаление проекта"
