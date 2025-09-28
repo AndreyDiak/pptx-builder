@@ -1,8 +1,16 @@
+import { getTracks } from "@/actions/track";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm_dialog";
 import { DateDisplay } from "@/components/ui/date_display";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { PresentationOptionsDialog } from "@/components/ui/presentation_options_dialog";
 import { CreateProjectDialogForm, type Project } from "@/entities/project";
+import {
+  generatePresentationHTMLWithAssets,
+  generatePresentationZIP,
+  testPresentationGenerator,
+  testStaticAssets,
+} from "@/services/presentationGenerator";
 import { cn } from "@/shared/utils";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,6 +24,8 @@ interface Props {
 export const ProjectHeader = ({ project, onDelete }: Props) => {
   const navigate = useNavigate();
   const [_, setOpen] = useState(false);
+  const [showPresentationOptions, setShowPresentationOptions] = useState(false);
+  const [isCreatingPresentation, setIsCreatingPresentation] = useState(false);
   const showDeadline = project.status === "editing" && project.deadline;
 
   const completed =
@@ -28,6 +38,151 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
       navigate("/");
     } catch {
       toast.error("Не удалось удалить проект");
+    }
+  };
+
+  const handleCreatePresentation = () => {
+    setShowPresentationOptions(true);
+  };
+
+  const handleSelectPresentationOption = async (option: "zip" | "html") => {
+    setShowPresentationOptions(false);
+    setIsCreatingPresentation(true);
+
+    try {
+      // Получаем треки проекта
+      const { data: tracks, error } = await getTracks(project.id);
+
+      if (error) {
+        toast.error("Не удалось загрузить треки");
+        return;
+      }
+
+      if (!tracks || tracks.length === 0) {
+        toast.error("В проекте нет треков");
+        return;
+      }
+
+      if (option === "zip") {
+        await createZipPresentation(project, tracks);
+      } else {
+        await createHtmlPresentation(project, tracks);
+      }
+    } catch (error) {
+      console.error("Ошибка создания презентации:", error);
+      toast.error(
+        `Не удалось создать презентацию: ${
+          error instanceof Error ? error.message : "Неизвестная ошибка"
+        }`
+      );
+    } finally {
+      setIsCreatingPresentation(false);
+    }
+  };
+
+  const createZipPresentation = async (project: Project, tracks: any[]) => {
+    // Показываем уведомление о начале создания
+    toast.info("Создание ZIP архива... Скачивание ассетов");
+
+    try {
+      // Создаем ZIP архив
+      const zipBlob = await generatePresentationZIP({
+        project,
+        tracks,
+      });
+
+      // Создаем и скачиваем ZIP файл
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `МУЗ_ЛОТО_${project.name.replace(/[^a-zA-Z0-9]/g, "_")}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success("ZIP архив успешно создан и скачан");
+    } catch (zipError) {
+      console.error("Ошибка создания ZIP:", zipError);
+      toast.error("Не удалось создать ZIP архив. Попробуйте HTML вариант.");
+    }
+  };
+
+  const createHtmlPresentation = async (project: Project, tracks: any[]) => {
+    // Показываем уведомление о начале создания
+    toast.info("Создание HTML файла... Скачивание ассетов");
+
+    try {
+      // Создаем HTML с встроенными ассетами
+      const htmlContent = await generatePresentationHTMLWithAssets({
+        project,
+        tracks,
+      });
+
+      // Создаем и скачиваем HTML файл
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `МУЗ_ЛОТО_${project.name.replace(
+        /[^a-zA-Z0-9]/g,
+        "_"
+      )}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success("HTML файл успешно создан и скачан");
+    } catch (htmlError) {
+      console.error("Ошибка создания HTML:", htmlError);
+      toast.error("Не удалось создать HTML файл");
+    }
+  };
+
+  const handleTestPresentation = () => {
+    try {
+      const { testProject, testTracks } = testPresentationGenerator();
+      console.log("Тестовые данные:", { testProject, testTracks });
+      toast.info("Тестовые данные созданы, проверьте консоль");
+    } catch (error) {
+      console.error("Ошибка тестирования:", error);
+      toast.error("Ошибка тестирования");
+    }
+  };
+
+  const handleTestNavigation = async () => {
+    try {
+      const { testProject, testTracks } = testPresentationGenerator();
+
+      // Создаем тестовую HTML презентацию
+      const htmlContent = await generatePresentationHTMLWithAssets({
+        project: testProject,
+        tracks: testTracks,
+      });
+
+      // Открываем в новой вкладке для тестирования
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+
+      toast.info("Тестовая презентация открыта в новой вкладке");
+    } catch (error) {
+      console.error("Ошибка тестирования навигации:", error);
+      toast.error("Ошибка тестирования навигации");
+    }
+  };
+
+  const handleTestStaticAssets = async () => {
+    try {
+      const staticAssets = await testStaticAssets();
+      console.log("Статические ассеты:", staticAssets);
+      toast.info(
+        `Загружено ${staticAssets.size} статических ассетов, проверьте консоль`
+      );
+    } catch (error) {
+      console.error("Ошибка тестирования статических ассетов:", error);
+      toast.error("Ошибка тестирования статических ассетов");
     }
   };
 
@@ -73,17 +228,34 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
             />
           </DialogContent>
         </Dialog>
-        <ConfirmDialog
-          title="Создание презентации"
-          confirmText="Создать презентацию"
-          onConfirm={() => {
-            console.log("...");
-          }}
+        <Button
+          size="sm"
+          disabled={!completed || isCreatingPresentation}
+          onClick={handleCreatePresentation}
         >
-          <Button size="sm" disabled={!completed}>
-            Создать презентацию
-          </Button>
-        </ConfirmDialog>
+          {isCreatingPresentation ? "Создание..." : "Создать презентацию"}
+        </Button>
+        {process.env.NODE_ENV === "development" && (
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleTestPresentation}
+            >
+              Тест
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleTestNavigation}>
+              Тест навигации
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleTestStaticAssets}
+            >
+              Тест ассетов
+            </Button>
+          </>
+        )}
         <ConfirmDialog
           variant="destructive"
           title="Удаление проекта"
@@ -96,6 +268,13 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
           </Button>
         </ConfirmDialog>
       </div>
+
+      {/* Диалог выбора формата презентации */}
+      <PresentationOptionsDialog
+        open={showPresentationOptions}
+        onOpenChange={setShowPresentationOptions}
+        onSelectOption={handleSelectPresentationOption}
+      />
     </div>
   );
 };
