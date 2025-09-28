@@ -462,4 +462,78 @@ export class StorageService {
       return false;
     }
   }
+
+  /**
+   * Загрузить аудиофайл для трека
+   */
+  static async uploadTrackAudio(
+    projectId: number,
+    file: File
+  ): Promise<{ path: string; url: string } | null> {
+    try {
+      const timestamp = Date.now();
+      const fileExtension = file.name.split('.').pop();
+      const fileName = `tracks/${projectId}/${timestamp}.${fileExtension}`;
+
+      const uploadResult = await this.uploadFile('audios', {
+        file,
+        path: fileName,
+        options: {
+          cacheControl: '3600',
+          upsert: false
+        }
+      });
+
+      if (!uploadResult) {
+        return null;
+      }
+
+      const publicUrl = this.getPublicUrl('audios', uploadResult.path);
+
+      return {
+        path: uploadResult.path,
+        url: publicUrl
+      };
+    } catch (error) {
+      console.error('Ошибка в uploadTrackAudio:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Загрузить изображение для трека
+   */
+  static async uploadTrackImage(
+    projectId: number,
+    file: File
+  ): Promise<{ path: string; url: string } | null> {
+    try {
+      const timestamp = Date.now();
+      const fileExtension = file.name.split('.').pop();
+      const fileName = `tracks/${projectId}/${timestamp}.${fileExtension}`;
+
+      const uploadResult = await this.uploadFile('photos', {
+        file,
+        path: fileName,
+        options: {
+          cacheControl: '3600',
+          upsert: false
+        }
+      });
+
+      if (!uploadResult) {
+        return null;
+      }
+
+      const publicUrl = this.getPublicUrl('photos', uploadResult.path);
+
+      return {
+        path: uploadResult.path,
+        url: publicUrl
+      };
+    } catch (error) {
+      console.error('Ошибка в uploadTrackImage:', error);
+      return null;
+    }
+  }
 }

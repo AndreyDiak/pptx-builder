@@ -42,7 +42,10 @@ export function ImageViewer({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogOverlay className="z-[9998]" />
-      <DialogContent className="image-viewer-dialog-content p-0 gradient-bg-animated border-none overflow-auto z-[9999] data-[state=open]:z-[9999]">
+      <DialogContent
+        showCloseButton={false}
+        className="image-viewer-dialog-content p-0 gradient-bg-animated border-none overflow-auto z-[9999] data-[state=open]:z-[9999]"
+      >
         <div className="relative min-w-full min-h-full flex items-center justify-center p-4">
           {/* Кнопка закрытия */}
           <button

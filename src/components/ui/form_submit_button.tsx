@@ -61,8 +61,6 @@ export function FormSubmitButton({
 
   const isDisabled = disabled || !isDirty || formState.isSubmitting;
 
-  console.log({ isDisabled, disabled, isDirty, formState });
-
   return (
     <Button
       type="submit"

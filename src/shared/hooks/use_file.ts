@@ -17,10 +17,20 @@ export function useFile({ bucket, folder = '', usePath = false }: UseFileOptions
       setUploading(true);
       setUploadProgress(0);
 
+      console.log("useFile uploadFileCallback called with:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        bucket,
+        folder
+      });
+
       // Создаем безопасное имя файла
       const fileExt = file.name.split('.').pop();
       const safeFileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = folder ? `${folder}/${safeFileName}` : safeFileName;
+
+      console.log("Uploading to path:", filePath);
 
       const { data, error } = await uploadFile(file, filePath, bucket);
       

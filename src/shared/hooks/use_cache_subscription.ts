@@ -12,7 +12,8 @@ export function useCacheSubscription({ keys, onInvalidate }: CacheSubscriptionOp
 
   useEffect(() => {
     const handleInvalidate = (key: string) => {
-      if (keys.some(k => key === k || key.startsWith(k + ':') || k.endsWith('*') && key.startsWith(k.slice(0, -1)))) {
+      const shouldNotify = keys.some(k => key === k || key.startsWith(k + ':') || k.endsWith('*') && key.startsWith(k.slice(0, -1)));
+      if (shouldNotify) {
         onInvalidateRef.current(key);
       }
     };

@@ -27,19 +27,21 @@ interface Props {
   onSuccess?: () => void;
 }
 
-interface FormValues extends Omit<ProjectInsert, "deadline"> {
+interface FormValues
+  extends Omit<ProjectInsert, "deadline" | "front_page_background_src"> {
   name: string;
   description?: string | null;
   deadlineEnabled: boolean;
   deadline?: Date;
-  bgFile?: FileList | string | null; // Может быть FileList, URL строкой или null
+  front_page_background_src: string | null | FileList;
+  // bgFile?: FileList | string | null; // Может быть FileList, URL строкой или null
 }
 
 const defaultValues: FormValues = {
   name: "",
   deadlineEnabled: false,
   deadline: undefined,
-  bgFile: null,
+  front_page_background_src: null,
 };
 
 export const CreateProjectDialogForm = ({
@@ -60,51 +62,48 @@ export const CreateProjectDialogForm = ({
     folder: "backgrounds",
   });
 
-  // const bgHref = propsDefaultValues?.bg_href;
-
   const manager = useForm<FormValues>({
     defaultValues: {
       ...defaultValues,
       ...propsDefaultValues,
       deadlineEnabled: !!propsDefaultValues?.deadline,
-      // Преобразуем строку deadline в Date, если она есть
       deadline: propsDefaultValues?.deadline
         ? new Date(propsDefaultValues?.deadline)
         : undefined,
-      // Устанавливаем bgFileFromBucket если есть существующее изображение
-      // bgFileFromBucket: propsDefaultValues?.bg_href || null,
     },
   });
   const deadlineEnabled = manager.watch("deadlineEnabled");
 
   const handleSubmit = useCallback(
     async ({ data }: { data: FormValues }) => {
-      let bgHref = propsDefaultValues?.front_page_background_src || null;
+      let backgroundSrc = propsDefaultValues?.front_page_background_src || null;
 
       // Обрабатываем файл
-      if (data.bgFile === null || data.bgFile === "") {
-        // Удаляем изображение
-        console.log("Удаляем изображение, устанавливаем bgHref = null");
-        bgHref = null;
-      } else if (data.bgFile instanceof FileList && data.bgFile.length > 0) {
+      if (
+        data.front_page_background_src === null ||
+        data.front_page_background_src === ""
+      ) {
+        backgroundSrc = null;
+      } else if (
+        data.front_page_background_src instanceof FileList &&
+        data.front_page_background_src.length > 0
+      ) {
         // Новый файл - загружаем
-        const file = data.bgFile[0];
+        const file = data.front_page_background_src[0];
         const uploadedUrl = await uploadFile(file);
         if (uploadedUrl) {
-          bgHref = uploadedUrl;
+          backgroundSrc = uploadedUrl;
         } else {
           toast.error("Не удалось загрузить файл");
           return;
         }
       } else if (
-        typeof data.bgFile === "string" &&
-        data.bgFile.startsWith("http")
+        typeof data.front_page_background_src === "string" &&
+        data.front_page_background_src.startsWith("http")
       ) {
         // URL из БД
-        bgHref = data.bgFile;
+        backgroundSrc = data.front_page_background_src;
       }
-
-      console.log("Финальное значение bgHref:", bgHref, typeof bgHref);
 
       const projectData: ProjectInsert = {
         name: data.name,
@@ -115,7 +114,7 @@ export const CreateProjectDialogForm = ({
         updated_at: new Date().toISOString(),
         size_x: data.size_x,
         size_y: data.size_y,
-        front_page_background_src: bgHref,
+        front_page_background_src: backgroundSrc,
       };
 
       try {
@@ -213,7 +212,7 @@ export const CreateProjectDialogForm = ({
           />
         </FormField>
         <FormField
-          name="bgFile"
+          name="front_page_background_src"
           label="Фоновое изображение"
           useController
           help="Не рекомендуется использовать изображения с весом больше 5 МБ"

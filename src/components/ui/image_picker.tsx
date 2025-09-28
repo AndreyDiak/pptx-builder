@@ -59,7 +59,10 @@ export function ImagePicker({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col"
+      >
         <DialogHeader>
           <DialogTitle>Выберите изображение</DialogTitle>
         </DialogHeader>

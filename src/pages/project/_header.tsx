@@ -61,7 +61,7 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
           <DialogTrigger asChild>
             <Button size="sm">Редактировать</Button>
           </DialogTrigger>
-          <DialogContent className="max-h-[85vh] w-[540px] overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
+          <DialogContent className="max-h-[85vh] w-[540px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
             <CreateProjectDialogForm
               defaultValues={project || undefined}
               onSuccess={() => setOpen(false)}

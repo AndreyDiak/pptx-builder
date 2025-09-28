@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { Button } from "./button";
 import {
   Dialog,
@@ -13,7 +13,7 @@ import {
 
 interface Props extends PropsWithChildren {
   title?: string;
-  description?: string;
+  description?: ReactNode;
   confirmText?: string;
   cancelText?: string;
   variant?: "destructive" | "default";

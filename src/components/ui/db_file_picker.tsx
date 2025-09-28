@@ -92,10 +92,10 @@ export function DbFilePicker({
             disabled={disabled}
             className={`
               w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 
-              bg-white border border-gray-300 rounded-lg 
-              hover:bg-gray-50 hover:border-gray-400 
+              bg-white border border-[var(--input)] rounded-lg 
+              hover:border-[var(--accent)] hover:bg-blue-50/50
               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-              transition-colors
+              transition-colors cursor-pointer
               ${disabled ? "opacity-50 cursor-not-allowed" : ""}
             `}
           >

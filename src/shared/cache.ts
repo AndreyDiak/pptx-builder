@@ -132,6 +132,65 @@ class CacheService {
       this.notifyInvalidate(key);
     });
   }
+
+  /**
+   * Update item in cache without invalidating
+   * Useful for optimistic updates
+   */
+  update<T>(key: string, updater: (currentData: T | null) => T): void {
+    const currentData = this.get<T>(key);
+    const newData = updater(currentData);
+    this.set(key, newData);
+    // Уведомляем подписчиков об обновлении (но не инвалидируем)
+    this.notifyUpdate(key);
+  }
+
+  /**
+   * Notify all subscribers about cache update (not invalidation)
+   */
+  private notifyUpdate(key: string): void {
+    if (this.isNotifying) {
+      return; // Prevent recursive notifications
+    }
+    
+    this.isNotifying = true;
+    try {
+      this.invalidateCallbacks.forEach(callback => {
+        try {
+          callback(key);
+        } catch (error) {
+          console.error('Error in cache update callback:', error);
+        }
+      });
+    } finally {
+      this.isNotifying = false;
+    }
+  }
+
+  /**
+   * Remove item from array in cache
+   * Useful for removing items from lists
+   */
+  removeFromArray<T>(key: string, predicate: (item: T) => boolean): void {
+    console.log(`removeFromArray called for key: ${key}`);
+    this.update<T[]>(key, (currentData) => {
+      console.log(`Current data for key ${key}:`, currentData);
+      if (!Array.isArray(currentData)) {
+        console.log(`Data is not array for key ${key}, returning empty array`);
+        return currentData || [];
+      }
+      const filtered = currentData.filter(item => !predicate(item));
+      console.log(`Filtered data for key ${key}:`, filtered);
+      return filtered;
+    });
+  }
+
+  /**
+   * Get all cache keys
+   */
+  getKeys(): string[] {
+    return Array.from(this.cache.keys());
+  }
 }
 
 // Create singleton instance

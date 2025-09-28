@@ -15,6 +15,7 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
 
   return (
     <div className={cn("", className)} {...rest}>
+      <h2 className="text-lg font-medium">Детали проекта</h2>
       <div className="mt-6">
         <div className="text-muted-foreground text-sm mb-4">
           {project.description}
