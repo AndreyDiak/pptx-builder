@@ -61,12 +61,29 @@ export function useHttp<T>(options: UseHttpOptions<T>) {
 		}
 	},[disabled])
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback(async () => {
     if (useCache && cacheId) {
-      cache.delete(cacheId);
+      // Fetch new data and update cache without notifying subscribers
+      setError(false);
+      setPending(true);
+      try {
+        const result = await fetcher();
+        const resultData = result.data;
+        setData(resultData);
+
+        // Update cache directly without notifying subscribers
+        if (resultData !== null) {
+          cache.set(cacheId, resultData, cacheTTL);
+        }
+      } catch {
+        setError(true);
+      } finally {
+        setPending(false);
+      }
+    } else {
+      load();
     }
-    load();
-  }, [load, useCache, cacheId]);
+  }, [fetcher, useCache, cacheId, cacheTTL, load]);
 
 	return {
 		data,

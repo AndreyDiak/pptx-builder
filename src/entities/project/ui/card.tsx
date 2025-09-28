@@ -18,7 +18,7 @@ import type { Project } from "../types";
 export const ProjectCard = ({ project }: { project: Project }) => {
   const slidesCount = project.track_ids?.length ?? 0;
   const total = project.size_x * project.size_y;
-  const progress = (slidesCount / total) * 100;
+  const progress = Math.round((slidesCount / total) * 100);
 
   return (
     <Card className="max-w-2xl">

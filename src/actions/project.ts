@@ -47,8 +47,6 @@ export async function addTrackToProject(projectId: number, trackId: number) {
 }
 
 export async function removeTrackFromProject(projectId: number, trackId: number) {
-  console.log(`removeTrackFromProject called: projectId=${projectId}, trackId=${trackId}`);
-  
   // Получаем текущий проект
   const { data: project, error: fetchError } = await supabase
     .from('projects')
@@ -57,17 +55,18 @@ export async function removeTrackFromProject(projectId: number, trackId: number)
     .single();
 
   if (fetchError) {
-    console.error('Error fetching project:', fetchError);
     throw fetchError;
   }
 
-  console.log('Current project track_ids:', project.track_ids);
-
   // Удаляем trackId из массива
   const currentTrackIds = project.track_ids || [];
+  
+  // Проверяем, есть ли trackId в массиве
+  if (!currentTrackIds.includes(trackId)) {
+    return { data: project, error: null };
+  }
+  
   const updatedTrackIds = currentTrackIds.filter(id => id !== trackId);
-
-  console.log('Updated track_ids:', updatedTrackIds);
 
   // Обновляем проект
   const result = await supabase
@@ -78,10 +77,8 @@ export async function removeTrackFromProject(projectId: number, trackId: number)
     .single();
 
   if (result.error) {
-    console.error('Error updating project:', result.error);
     throw result.error;
   }
 
-  console.log('Project updated successfully:', result.data);
   return result;
 }

@@ -23,7 +23,7 @@ import { StorageService } from "@/services/storageService";
 import { useProject } from "@/shared/hooks/use_project";
 import { useTrack } from "@/shared/hooks/use_track";
 import { useTracks } from "@/shared/hooks/use_tracks";
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { TrackInsert } from "../types";
 
@@ -49,32 +49,33 @@ export const CreateTrackDialogForm = ({
 }: Props) => {
   const edit = !!propsDefaultValues?.id;
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const audioFileRef = useRef<File | null>(null);
+  const [isTrimming, setIsTrimming] = useState(false);
+  const [trimProgress, setTrimProgress] = useState(0);
 
   const handleAudioFileChange = useCallback(
     (file: File | null) => {
-      console.log("=== handleAudioFileChange CALLED ===");
-      console.log(
-        "New file:",
-        file
-          ? {
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              isTrimmed: file.name.includes("_trimmed"),
-            }
-          : null
-      );
-      console.log(
-        "Previous audioFile state:",
-        audioFile?.name,
-        audioFile?.size
-      );
+      // Проверяем, что это действительно обрезанный файл
+      if (file && file.name.includes("_trimmed")) {
+        setIsTrimming(false); // Обрезка завершена
+        setTrimProgress(0); // Сбрасываем прогресс
+      }
+
       setAudioFile(file);
-      console.log("audioFile state updated to:", file?.name, file?.size);
-      console.log("=== handleAudioFileChange COMPLETED ===");
+      audioFileRef.current = file; // Обновляем ref синхронно
     },
     [audioFile]
   );
+
+  const handleEditorOpen = useCallback(() => {
+    setIsTrimming(true);
+    setTrimProgress(0);
+  }, []);
+
+  const handleTrimProgress = useCallback((progress: number) => {
+    setTrimProgress(progress);
+  }, []);
+
   const [isUploading, setIsUploading] = useState(false);
 
   const { onCreate, onUpdate } = useTrack(
@@ -103,36 +104,33 @@ export const CreateTrackDialogForm = ({
 
   const handleSubmit = useCallback(
     async ({ data }: { data: FormValues }) => {
+      // Если идет обрезка, ждем ее завершения
+      if (isTrimming) {
+        // Ждем до 30 секунд
+        let attempts = 0;
+        while (isTrimming && attempts < 60) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          attempts++;
+        }
+      }
+
       setIsUploading(true);
 
       try {
         let audioSrc = data.audio_src;
         let imageSrc = data.image_src;
 
-        console.log("Form data:", data);
-        console.log("image_src type:", typeof data.image_src);
-        console.log("image_src value:", data.image_src);
-
-        // Загружаем аудио файл, если он есть
-        if (audioFile) {
-          console.log("=== UPLOADING AUDIO FILE ===");
-          console.log("audioFile details:", {
-            name: audioFile.name,
-            size: audioFile.size,
-            type: audioFile.type,
-            isTrimmed: audioFile.name.includes("_trimmed"),
-          });
-          console.log("audioFile object:", audioFile);
+        // Загружаем аудио файл, если он есть (используем ref для актуального значения)
+        const currentAudioFile = audioFileRef.current || audioFile;
+        if (currentAudioFile) {
           const audioResult = await StorageService.uploadTrackAudio(
             projectId,
-            audioFile
+            currentAudioFile
           );
           if (!audioResult) {
             throw new Error("Не удалось загрузить аудио файл");
           }
           audioSrc = audioResult.url;
-          console.log("Audio uploaded successfully:", audioResult.url);
-          console.log("=== AUDIO UPLOAD COMPLETED ===");
         }
 
         // Загружаем изображение, если оно есть и это новый файл
@@ -153,7 +151,6 @@ export const CreateTrackDialogForm = ({
           ) {
             const fileList = data.image_src as FileList;
             if (fileList.length > 0) {
-              console.log("Uploading image file:", fileList[0].name);
               const imageResult = await StorageService.uploadTrackImage(
                 projectId,
                 fileList[0]
@@ -162,22 +159,15 @@ export const CreateTrackDialogForm = ({
                 throw new Error("Не удалось загрузить изображение");
               }
               imageSrc = imageResult.url;
-              console.log("Image uploaded successfully:", imageResult.url);
             } else {
-              console.log("FileList is empty, setting imageSrc to null");
               imageSrc = null;
             }
           }
           // Если это пустой объект или что-то другое, устанавливаем null
           else {
-            console.log(
-              "Setting imageSrc to null due to invalid data:",
-              data.image_src
-            );
             imageSrc = null;
           }
         } else {
-          console.log("Setting imageSrc to null - no image data");
           imageSrc = null;
         }
 
@@ -205,7 +195,16 @@ export const CreateTrackDialogForm = ({
         setIsUploading(false);
       }
     },
-    [onCreate, onUpdate, projectId, audioFile, edit, isUploading]
+    [
+      onCreate,
+      onUpdate,
+      projectId,
+      audioFile,
+      edit,
+      isUploading,
+      isTrimming,
+      trimProgress,
+    ]
   );
 
   return (
@@ -287,19 +286,39 @@ export const CreateTrackDialogForm = ({
           {(props) => (
             <AudioInput
               onFileChange={handleAudioFileChange}
+              onEditorOpen={handleEditorOpen}
+              onTrimProgress={handleTrimProgress}
               {...props}
               placeholder="Перетащите аудио файл или загрузите"
             />
           )}
         </FormField>
 
+        {isTrimming && (
+          <div className="w-full mb-3">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+              <p className="text-sm font-medium text-[var(--primary)]">
+                Обрезка аудио... {Math.round(trimProgress)}%
+              </p>
+            </div>
+            <div className="w-full bg-blue-200 rounded-full h-1.5">
+              <div
+                className="bg-[var(--primary)] h-1.5 rounded-full transition-all duration-300"
+                style={{ width: `${trimProgress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
         <DialogFooter>
           <FormSubmitButton
             className="flex-1 h-12 text-base font-semibold"
             size="lg"
-            disabled={isUploading}
+            disabled={isUploading || isTrimming}
           >
-            {isUploading
+            {isTrimming
+              ? "Обрезка аудио..."
+              : isUploading
               ? "Загрузка..."
               : edit
               ? "Обновить трек"

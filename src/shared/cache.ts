@@ -146,6 +146,42 @@ class CacheService {
   }
 
   /**
+   * Update cache with new data from server response
+   * This method merges new data with existing data instead of invalidating
+   */
+  updateWithPayload<T>(key: string, newPayload: T): void {
+    const currentData = this.get<T>(key);
+    
+    // If no current data, just set the new data
+    if (!currentData) {
+      this.set(key, newPayload);
+      this.notifyUpdate(key);
+      return;
+    }
+
+    // If current data is an array and new payload is also an array, merge them
+    if (Array.isArray(currentData) && Array.isArray(newPayload)) {
+      // For arrays, we assume the new payload is the complete updated list
+      this.set(key, newPayload);
+      this.notifyUpdate(key);
+      return;
+    }
+
+    // If current data is an object and new payload is also an object, merge them
+    if (typeof currentData === 'object' && typeof newPayload === 'object' && 
+        currentData !== null && newPayload !== null) {
+      const mergedData = { ...currentData, ...newPayload };
+      this.set(key, mergedData);
+      this.notifyUpdate(key);
+      return;
+    }
+
+    // For primitive types or mixed types, replace with new data
+    this.set(key, newPayload);
+    this.notifyUpdate(key);
+  }
+
+  /**
    * Notify all subscribers about cache update (not invalidation)
    */
   private notifyUpdate(key: string): void {

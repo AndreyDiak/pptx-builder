@@ -13,6 +13,7 @@ interface AudioInputProps {
   className?: string;
   placeholder?: string;
   onEditorOpen?: () => void;
+  onTrimProgress?: (progress: number) => void;
 }
 
 export const AudioInput = ({
@@ -22,6 +23,7 @@ export const AudioInput = ({
   className,
   placeholder = "Выберите аудио файл...",
   onEditorOpen,
+  onTrimProgress,
 }: AudioInputProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -131,19 +133,11 @@ export const AudioInput = ({
         DUAL_CHANNEL: 2,
         MONO: 3,
       };
-      console.log("MPEGMode initialized");
     }
 
     // Создаем MP3 энкодер
     const mp3encoder = new lamejs.Mp3Encoder(numberOfChannels, sampleRate, 128); // 128 kbps
     const mp3Data: Int8Array[] = [];
-
-    console.log("lamejs encoding started:", {
-      numberOfChannels,
-      sampleRate,
-      length,
-      blockSize: 1152,
-    });
 
     // Кодируем по блокам
     const blockSize = 1152; // Стандартный размер блока для MP3
@@ -163,11 +157,6 @@ export const AudioInput = ({
       mp3Data.push(finalMp3buf);
     }
 
-    console.log("lamejs encoding completed:", {
-      chunks: mp3Data.length,
-      totalChunksLength: mp3Data.reduce((acc, chunk) => acc + chunk.length, 0),
-    });
-
     // Объединяем все блоки
     const totalLength = mp3Data.reduce((acc, chunk) => acc + chunk.length, 0);
     const mp3Buffer = new Uint8Array(totalLength);
@@ -178,7 +167,6 @@ export const AudioInput = ({
       offset += chunk.length;
     }
 
-    console.log("lamejs final buffer size:", mp3Buffer.length);
     return new Blob([mp3Buffer], { type: "audio/mpeg" });
   }, []);
 
@@ -190,24 +178,14 @@ export const AudioInput = ({
         return;
       }
 
-      console.log("processFile called with:", {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        isTrimmed: file.name.includes("_trimmed"),
-      });
-
       const url = URL.createObjectURL(file);
       setAudioUrl(url);
       setAudioFile(file);
       setOriginalFile(file); // Сохраняем оригинальный файл
       onChange?.(url);
-      console.log("processFile calling onFileChange with file:", {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      });
-      onFileChange?.(file);
+      if (onFileChange) {
+        onFileChange(file);
+      }
     },
     [onChange, onFileChange]
   );
@@ -260,13 +238,6 @@ export const AudioInput = ({
 
   const trimAudioFile = useCallback(
     async (file: File, startTime: number, endTime: number): Promise<File> => {
-      console.log("trimAudioFile called:", {
-        fileName: file.name,
-        fileSize: file.size,
-        startTime,
-        endTime,
-      });
-
       return new Promise((resolve, reject) => {
         const audio = new Audio();
         const url = URL.createObjectURL(file);
@@ -275,13 +246,6 @@ export const AudioInput = ({
           const duration = audio.duration;
           const start = Math.max(0, startTime);
           const end = Math.min(duration, endTime);
-
-          console.log("Audio metadata loaded:", {
-            duration,
-            start,
-            end,
-            trimDuration: end - start,
-          });
 
           // Создаем новый аудио контекст для обрезки
           const audioContext = new (window.AudioContext ||
@@ -292,19 +256,10 @@ export const AudioInput = ({
             .then((response) => response.arrayBuffer())
             .then((arrayBuffer) => audioContext.decodeAudioData(arrayBuffer))
             .then((audioBuffer) => {
-              console.log("AudioBuffer decoded:", {
-                length: audioBuffer.length,
-                duration: audioBuffer.duration,
-                sampleRate: audioBuffer.sampleRate,
-                numberOfChannels: audioBuffer.numberOfChannels,
-              });
-
               // Создаем обрезанный буфер
               const startSample = Math.floor(start * audioBuffer.sampleRate);
               const endSample = Math.floor(end * audioBuffer.sampleRate);
               const length = endSample - startSample;
-
-              console.log("Trim samples:", { startSample, endSample, length });
 
               const trimmedBuffer = audioContext.createBuffer(
                 audioBuffer.numberOfChannels,
@@ -325,24 +280,13 @@ export const AudioInput = ({
                 }
               }
 
-              console.log("Trimmed buffer created:", {
-                length: trimmedBuffer.length,
-                duration: trimmedBuffer.duration,
-              });
-
               // Конвертируем обратно в файл, сохраняя оригинальный формат
               audioBufferToFile(trimmedBuffer, file)
                 .then((trimmedFile) => {
-                  console.log(
-                    "audioBufferToFile completed:",
-                    trimmedFile.name,
-                    trimmedFile.size
-                  );
                   URL.revokeObjectURL(url);
                   resolve(trimmedFile);
                 })
                 .catch((error) => {
-                  console.error("audioBufferToFile failed:", error);
                   reject(error);
                 });
             })
@@ -380,13 +324,6 @@ export const AudioInput = ({
 
   const audioBufferToFile = useCallback(
     async (buffer: AudioBuffer, originalFile: File): Promise<File> => {
-      console.log("audioBufferToFile started:", {
-        bufferLength: buffer.length,
-        bufferDuration: buffer.duration,
-        originalType: originalFile.type,
-        originalName: originalFile.name,
-      });
-
       // Определяем формат на основе оригинального файла
       const originalType = originalFile.type;
       const originalName = originalFile.name;
@@ -397,7 +334,7 @@ export const AudioInput = ({
         originalType.includes("mpeg") ||
         originalName.toLowerCase().endsWith(".mp3")
       ) {
-        console.log("Trying lamejs MP3 encoding...");
+        onTrimProgress?.(20); // 20% - начало кодирования
         try {
           const mp3Blob = audioBufferToMp3(buffer);
           const trimmedFile = new File(
@@ -406,52 +343,46 @@ export const AudioInput = ({
             { type: "audio/mpeg" }
           );
 
-          console.log("lamejs MP3 created:", {
-            name: trimmedFile.name,
-            size: trimmedFile.size,
-            type: trimmedFile.type,
-          });
-
           // Проверяем качество созданного файла
           const isValid = await validateAudioFile(trimmedFile);
-          console.log("lamejs MP3 validation:", isValid);
           if (isValid) {
             return trimmedFile;
           }
         } catch (error) {
-          console.error("lamejs error:", error);
           // Продолжаем к MediaRecorder
         }
 
-        console.log("Trying MediaRecorder MP3 encoding...");
+        onTrimProgress?.(40); // 40% - MediaRecorder
         try {
-          const mp3Blob = await audioBufferToMp3WithMediaRecorder(buffer);
+          // Добавляем таймаут для MediaRecorder
+          const mp3Blob = (await Promise.race([
+            audioBufferToMp3WithMediaRecorder(buffer),
+            new Promise((_, reject) =>
+              setTimeout(
+                () => reject(new Error("MediaRecorder timeout")),
+                30000
+              )
+            ),
+          ])) as Blob;
+
           const trimmedFile = new File(
             [mp3Blob],
             originalName.replace(/\.[^/.]+$/, "_trimmed.mp3"),
             { type: "audio/mpeg" }
           );
 
-          console.log("MediaRecorder MP3 created:", {
-            name: trimmedFile.name,
-            size: trimmedFile.size,
-            type: trimmedFile.type,
-          });
-
           // Проверяем качество созданного файла
           const isValid = await validateAudioFile(trimmedFile);
-          console.log("MediaRecorder MP3 validation:", isValid);
           if (isValid) {
             return trimmedFile;
           }
         } catch (mediaRecorderError) {
-          console.error("MediaRecorder error:", mediaRecorderError);
           // Fallback к WAV
         }
       }
 
       // Fallback: создаем WAV файл
-      console.log("Trying WAV encoding...");
+      onTrimProgress?.(60); // 60% - WAV кодирование
       const length = buffer.length;
       const numberOfChannels = buffer.numberOfChannels;
       const sampleRate = buffer.sampleRate;
@@ -503,24 +434,15 @@ export const AudioInput = ({
         { type: "audio/wav" }
       );
 
-      console.log("WAV file created:", {
-        name: wavFile.name,
-        size: wavFile.size,
-        type: wavFile.type,
-      });
+      onTrimProgress?.(80); // 80% - валидация
 
       // Проверяем качество WAV файла
       const isValid = await validateAudioFile(wavFile);
-      console.log("WAV validation:", isValid);
       if (isValid) {
+        onTrimProgress?.(90); // 90% - готово
         return wavFile;
       }
 
-      console.log(
-        "All methods failed, returning original file:",
-        originalFile.name,
-        originalFile.size
-      );
       // Если WAV тоже не работает, возвращаем оригинальный файл
       return originalFile;
     },
@@ -529,54 +451,33 @@ export const AudioInput = ({
 
   const handleEdit = useCallback(
     (startTime: number, endTime: number) => {
-      console.log("handleEdit called:", {
-        startTime,
-        endTime,
-        hasAudioFile: !!audioFile,
-      });
-
       // Сохраняем настройки обрезки
       setTrimSettings({ startTime, endTime });
 
       // Если есть файл, обрезаем его
       if (audioFile) {
-        console.log("Starting trim with file:", audioFile.name, audioFile.size);
+        // Уведомляем о начале обрезки
+        onTrimProgress?.(0);
+
         trimAudioFile(audioFile, startTime, endTime)
           .then((trimmedFile) => {
-            console.log(
-              "Trim completed, new file:",
-              trimmedFile.name,
-              trimmedFile.size
-            );
+            // Уведомляем о завершении обрезки
+            onTrimProgress?.(100);
+
+            // Обновляем состояние
             setAudioFile(trimmedFile);
-            console.log("Calling onFileChange with trimmed file:", {
-              name: trimmedFile.name,
-              size: trimmedFile.size,
-              type: trimmedFile.type,
-            });
-            console.log("onFileChange function:", onFileChange);
-            console.log("onFileChange type:", typeof onFileChange);
+
+            // Вызываем onFileChange
             if (onFileChange) {
-              console.log("Calling onFileChange...");
               onFileChange(trimmedFile);
-              console.log("onFileChange called successfully");
-            } else {
-              console.warn("onFileChange is not defined!");
             }
-            console.log(
-              "onFileChange called, current audioFile state:",
-              audioFile?.name,
-              audioFile?.size
-            );
           })
           .catch((error) => {
-            console.error("Ошибка при обрезке аудио:", error);
+            console.error("❌ Ошибка при обрезке аудио:", error);
           });
-      } else {
-        console.warn("No audioFile to trim!");
       }
     },
-    [audioFile, trimAudioFile, onFileChange]
+    [audioFile, trimAudioFile, onFileChange, onTrimProgress]
   );
 
   const resetTrim = useCallback(() => {
@@ -618,7 +519,6 @@ export const AudioInput = ({
         setIsPlaying(true);
       }
     } catch (error) {
-      console.error("Error toggling playback:", error);
       setIsPlaying(false);
     }
   }, [isPlaying, audioUrl, trimSettings]);
@@ -631,8 +531,7 @@ export const AudioInput = ({
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
     const handleEnded = () => setIsPlaying(false);
-    const handleError = (e: Event) => {
-      console.error("Audio playback error:", e);
+    const handleError = () => {
       setIsPlaying(false);
     };
 

@@ -51,14 +51,20 @@ export function useTrack(id: number, disabled?: boolean) {
   const onCreate = useCallback(async (payload: TrackInsert) => {
     try {
       const result = await createTrack(payload);
+      
       if (result.data) {
         if (payload.project_id) {
           await addTrackToProject(payload.project_id, result.data.id);
         }
         
-        invalidateCache();
-        // Инвалидируем кэш проекта
-        cache.invalidate(`project:${payload.project_id}`);
+        // Инвалидируем кэш списка треков, чтобы он обновился с сервера
+        const tracksCacheKey = `tracks:${payload.project_id}`;
+        cache.invalidate(tracksCacheKey);
+        
+        // Инвалидируем кэш проекта, чтобы он обновился с сервера
+        const projectCacheKey = `project:${payload.project_id}`;
+        cache.invalidate(projectCacheKey);
+        
         toast.success("Трек успешно создан");
         return result.data;
       } else {
@@ -72,42 +78,39 @@ export function useTrack(id: number, disabled?: boolean) {
 
   const onDelete = useCallback(async () => {
     try {
-      console.log('Starting delete for track id:', id);
+      // Получаем данные трека из кэша или из базы данных
+      let trackData = http.data;
+      let projectId = trackData?.project_id;
       
-      // Получаем данные трека для получения project_id
-      const trackData = http.data;
-      const projectId = trackData?.project_id;
-      
-      console.log('Track data:', trackData);
-      console.log('Project ID from track data:', projectId);
-      
-      // Удаляем трек из базы данных
-      await deleteTrack(id);
-      
-      // Удаляем трек из track_ids проекта
-      if (projectId) {
-        console.log('Removing track from project track_ids:', projectId, id);
-        await removeTrackFromProject(projectId, id);
-        console.log('Successfully removed track from project');
-      } else {
-        console.log('No project ID found, skipping track_ids update');
+      // Если данные трека не загружены в кэше, получаем их из БД
+      if (!trackData || !projectId) {
+        const { data: fetchedTrack, error: fetchError } = await getTrack(id);
+        if (fetchError) {
+          throw fetchError;
+        }
+        trackData = fetchedTrack;
+        projectId = trackData?.project_id;
       }
       
-      // Инвалидируем кэш списка треков для обновления UI
-      cache.invalidate("tracks:*");
+      // Сначала удаляем трек из track_ids проекта
+      if (projectId) {
+        await removeTrackFromProject(projectId, id);
+      }
       
-      // Инвалидируем кэш конкретного трека
+      // Затем удаляем трек из базы данных
+      await deleteTrack(id);
+      
+      // Удаляем кэш конкретного трека
       cache.invalidate(`track:${id}`);
       
-      // Инвалидируем кэш проекта
+      // Инвалидируем кэш списка треков и проекта, чтобы они обновились с сервера
       if (projectId) {
-        console.log('Invalidating project cache:', projectId);
+        cache.invalidate(`tracks:${projectId}`);
         cache.invalidate(`project:${projectId}`);
       }
       
       toast.success("Трек успешно удален");
     } catch (error) {
-      console.error('Error deleting track:', error);
       toast.error("Не удалось удалить трек");
       throw error;
     }
