@@ -35,12 +35,14 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
     <div
       className={cn(
         "grid items-center mb-4",
-        showDeadline ? "grid-cols-[3fr_1fr_3fr]" : "grid-cols-[1fr_auto]"
+        showDeadline
+          ? "grid-cols-[1fr_1fr_2fr] 2xl:grid-cols-[3fr_1fr_3fr]"
+          : "grid-cols-[1fr_auto]"
       )}
     >
       <h1 className="text-2xl">{project.name}</h1>
       {showDeadline && (
-        <div className="text-center text-muted-foreground">
+        <div className="2xl:text-center text-muted-foreground">
           Дедлайн{" "}
           <DateDisplay
             date={project.deadline!}
@@ -57,9 +59,9 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
         >
           Вернуться на главную
         </Link>
-        <Button size="sm" variant="outline" disabled>
+        {/* <Button size="sm" variant="outline" disabled>
           Предпросмотр
-        </Button>
+        </Button> */}
         <Dialog>
           <DialogTrigger asChild>
             <Button size="sm">Редактировать</Button>
