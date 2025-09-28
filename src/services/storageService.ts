@@ -1,4 +1,4 @@
-import { supabase } from '../../supabase/client';
+import { supabase } from "../../supabase/client";
 
 /**
  * Типы для работы с файлами
@@ -46,12 +46,11 @@ export interface StorageBucket {
  * Сервис для работы с Supabase Storage
  */
 export class StorageService {
-  
   /**
    * Создать бакет для хранения файлов
    */
   static async createBucket(
-    bucketName: string, 
+    bucketName: string,
     isPublic: boolean = true,
     options?: {
       fileSizeLimit?: number;
@@ -59,21 +58,21 @@ export class StorageService {
     }
   ): Promise<boolean> {
     try {
-      const { data, error } = await supabase.storage.createBucket(bucketName, {
+      const { error } = await supabase.storage.createBucket(bucketName, {
         public: isPublic,
         fileSizeLimit: options?.fileSizeLimit,
-        allowedMimeTypes: options?.allowedMimeTypes
+        allowedMimeTypes: options?.allowedMimeTypes,
       });
 
       if (error) {
-        console.error('Ошибка при создании бакета:', error);
+        console.error("Ошибка при создании бакета:", error);
         return false;
       }
 
-      console.log('✅ Бакет создан:', bucketName);
+      console.log("✅ Бакет создан:", bucketName);
       return true;
     } catch (error) {
-      console.error('Ошибка в createBucket:', error);
+      console.error("Ошибка в createBucket:", error);
       return false;
     }
   }
@@ -86,13 +85,13 @@ export class StorageService {
       const { data, error } = await supabase.storage.listBuckets();
 
       if (error) {
-        console.error('Ошибка при получении бакетов:', error);
+        console.error("Ошибка при получении бакетов:", error);
         return [];
       }
 
-      return data || [];
+      return (data as StorageBucket[]) || [];
     } catch (error) {
-      console.error('Ошибка в getBuckets:', error);
+      console.error("Ошибка в getBuckets:", error);
       return [];
     }
   }
@@ -110,16 +109,16 @@ export class StorageService {
         .upload(fileUpload.path, fileUpload.file, fileUpload.options);
 
       if (error) {
-        console.error('Ошибка при загрузке файла:', error);
+        console.error("Ошибка при загрузке файла:", error);
         return null;
       }
 
       return {
         path: data.path,
-        fullPath: data.fullPath
+        fullPath: data.fullPath,
       };
     } catch (error) {
-      console.error('Ошибка в uploadFile:', error);
+      console.error("Ошибка в uploadFile:", error);
       return null;
     }
   }
@@ -132,14 +131,14 @@ export class StorageService {
     files: FileUpload[]
   ): Promise<Array<{ path: string; fullPath: string } | null>> {
     try {
-      const uploadPromises = files.map(fileUpload => 
+      const uploadPromises = files.map((fileUpload) =>
         this.uploadFile(bucketName, fileUpload)
       );
 
       const results = await Promise.all(uploadPromises);
       return results;
     } catch (error) {
-      console.error('Ошибка в uploadMultipleFiles:', error);
+      console.error("Ошибка в uploadMultipleFiles:", error);
       return [];
     }
   }
@@ -148,9 +147,7 @@ export class StorageService {
    * Получить публичный URL файла
    */
   static getPublicUrl(bucketName: string, path: string): string {
-    const { data } = supabase.storage
-      .from(bucketName)
-      .getPublicUrl(path);
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(path);
 
     return data.publicUrl;
   }
@@ -169,13 +166,13 @@ export class StorageService {
         .createSignedUrl(path, expiresIn);
 
       if (error) {
-        console.error('Ошибка при создании подписанного URL:', error);
+        console.error("Ошибка при создании подписанного URL:", error);
         return null;
       }
 
       return data.signedUrl;
     } catch (error) {
-      console.error('Ошибка в getSignedUrl:', error);
+      console.error("Ошибка в getSignedUrl:", error);
       return null;
     }
   }
@@ -193,13 +190,13 @@ export class StorageService {
         .download(path);
 
       if (error) {
-        console.error('Ошибка при скачивании файла:', error);
+        console.error("Ошибка при скачивании файла:", error);
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error('Ошибка в downloadFile:', error);
+      console.error("Ошибка в downloadFile:", error);
       return null;
     }
   }
@@ -209,11 +206,11 @@ export class StorageService {
    */
   static async listFiles(
     bucketName: string,
-    path: string = '',
+    path: string = "",
     options?: {
       limit?: number;
       offset?: number;
-      sortBy?: { column: string; order: 'asc' | 'desc' };
+      sortBy?: { column: string; order: "asc" | "desc" };
     }
   ): Promise<FileInfo[]> {
     try {
@@ -222,13 +219,13 @@ export class StorageService {
         .list(path, options);
 
       if (error) {
-        console.error('Ошибка при получении списка файлов:', error);
+        console.error("Ошибка при получении списка файлов:", error);
         return [];
       }
 
-      return data || [];
+      return (data as unknown as FileInfo[]) || [];
     } catch (error) {
-      console.error('Ошибка в listFiles:', error);
+      console.error("Ошибка в listFiles:", error);
       return [];
     }
   }
@@ -241,18 +238,16 @@ export class StorageService {
     paths: string[]
   ): Promise<boolean> {
     try {
-      const { error } = await supabase.storage
-        .from(bucketName)
-        .remove(paths);
+      const { error } = await supabase.storage.from(bucketName).remove(paths);
 
       if (error) {
-        console.error('Ошибка при удалении файла:', error);
+        console.error("Ошибка при удалении файла:", error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Ошибка в deleteFile:', error);
+      console.error("Ошибка в deleteFile:", error);
       return false;
     }
   }
@@ -271,13 +266,13 @@ export class StorageService {
         .move(fromPath, toPath);
 
       if (error) {
-        console.error('Ошибка при перемещении файла:', error);
+        console.error("Ошибка при перемещении файла:", error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Ошибка в moveFile:', error);
+      console.error("Ошибка в moveFile:", error);
       return false;
     }
   }
@@ -296,13 +291,13 @@ export class StorageService {
         .copy(fromPath, toPath);
 
       if (error) {
-        console.error('Ошибка при копировании файла:', error);
+        console.error("Ошибка при копировании файла:", error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Ошибка в copyFile:', error);
+      console.error("Ошибка в copyFile:", error);
       return false;
     }
   }
@@ -317,18 +312,49 @@ export class StorageService {
     try {
       const { data, error } = await supabase.storage
         .from(bucketName)
-        .list(path.split('/').slice(0, -1).join('/'), {
-          search: path.split('/').pop()
+        .list(path.split("/").slice(0, -1).join("/"), {
+          search: path.split("/").pop(),
         });
 
       if (error) {
-        console.error('Ошибка при получении информации о файле:', error);
+        console.error("Ошибка при получении информации о файле:", error);
         return null;
       }
 
-      return data?.[0] || null;
+      if (data && data[0]) {
+        const fileObj = data[0];
+        // Приводим FileObject к типу FileInfo, заполняя недостающие поля заглушками или undefined
+        const fileInfo: FileInfo = {
+          ...fileObj,
+          metadata: {
+            eTag: fileObj.metadata?.eTag ?? "",
+            size:
+              fileObj.metadata?.size ?? fileObj.metadata?.ContentLength ?? 0,
+            mimetype:
+              fileObj.metadata?.mimetype ?? fileObj.metadata?.ContentType ?? "",
+            cacheControl:
+              fileObj.metadata?.cacheControl ??
+              fileObj.metadata?.CacheControl ??
+              "",
+            lastModified:
+              fileObj.metadata?.lastModified ??
+              fileObj.metadata?.LastModified ??
+              "",
+            contentLength:
+              fileObj.metadata?.contentLength ??
+              fileObj.metadata?.ContentLength ??
+              0,
+            httpStatusCode:
+              fileObj.metadata?.httpStatusCode ??
+              fileObj.metadata?.HttpStatusCode ??
+              200,
+          },
+        };
+        return fileInfo;
+      }
+      return null;
     } catch (error) {
-      console.error('Ошибка в getFileInfo:', error);
+      console.error("Ошибка в getFileInfo:", error);
       return null;
     }
   }
@@ -344,32 +370,32 @@ export class StorageService {
     try {
       // Создаем путь для аудиофайла
       const timestamp = Date.now();
-      const fileExtension = file.name.split('.').pop();
-      const fileName = slideId 
+      const fileExtension = file.name.split(".").pop();
+      const fileName = slideId
         ? `audio/${projectId}/${slideId}/${timestamp}.${fileExtension}`
         : `audio/${projectId}/${timestamp}.${fileExtension}`;
 
-      const uploadResult = await this.uploadFile('audio-files', {
+      const uploadResult = await this.uploadFile("audio-files", {
         file,
         path: fileName,
         options: {
-          cacheControl: '3600',
-          upsert: false
-        }
+          cacheControl: "3600",
+          upsert: false,
+        },
       });
 
       if (!uploadResult) {
         return null;
       }
 
-      const publicUrl = this.getPublicUrl('audio-files', uploadResult.path);
+      const publicUrl = this.getPublicUrl("audio-files", uploadResult.path);
 
       return {
         path: uploadResult.path,
-        url: publicUrl
+        url: publicUrl,
       };
     } catch (error) {
-      console.error('Ошибка в uploadAudioForProject:', error);
+      console.error("Ошибка в uploadAudioForProject:", error);
       return null;
     }
   }
@@ -384,30 +410,30 @@ export class StorageService {
   ): Promise<{ path: string; url: string } | null> {
     try {
       const timestamp = Date.now();
-      const fileExtension = file.name.split('.').pop();
+      const fileExtension = file.name.split(".").pop();
       const fileName = `images/${projectId}/${slideId}/${timestamp}.${fileExtension}`;
 
-      const uploadResult = await this.uploadFile('slide-images', {
+      const uploadResult = await this.uploadFile("slide-images", {
         file,
         path: fileName,
         options: {
-          cacheControl: '3600',
-          upsert: false
-        }
+          cacheControl: "3600",
+          upsert: false,
+        },
       });
 
       if (!uploadResult) {
         return null;
       }
 
-      const publicUrl = this.getPublicUrl('slide-images', uploadResult.path);
+      const publicUrl = this.getPublicUrl("slide-images", uploadResult.path);
 
       return {
         path: uploadResult.path,
-        url: publicUrl
+        url: publicUrl,
       };
     } catch (error) {
-      console.error('Ошибка в uploadImageForSlide:', error);
+      console.error("Ошибка в uploadImageForSlide:", error);
       return null;
     }
   }
@@ -421,16 +447,16 @@ export class StorageService {
   }> {
     try {
       const [audioFiles, imageFiles] = await Promise.all([
-        this.listFiles('audio-files', `audio/${projectId}`),
-        this.listFiles('slide-images', `images/${projectId}`)
+        this.listFiles("audio-files", `audio/${projectId}`),
+        this.listFiles("slide-images", `images/${projectId}`),
       ]);
 
       return {
         audio: audioFiles,
-        images: imageFiles
+        images: imageFiles,
       };
     } catch (error) {
-      console.error('Ошибка в getProjectFiles:', error);
+      console.error("Ошибка в getProjectFiles:", error);
       return { audio: [], images: [] };
     }
   }
@@ -441,10 +467,10 @@ export class StorageService {
   static async deleteProjectFiles(projectId: string): Promise<boolean> {
     try {
       const projectFiles = await this.getProjectFiles(projectId);
-      
+
       const allPaths = [
-        ...projectFiles.audio.map(file => file.name),
-        ...projectFiles.images.map(file => file.name)
+        ...projectFiles.audio.map((file) => file.name),
+        ...projectFiles.images.map((file) => file.name),
       ];
 
       if (allPaths.length === 0) {
@@ -452,13 +478,19 @@ export class StorageService {
       }
 
       const [audioResult, imageResult] = await Promise.all([
-        this.deleteFile('audio-files', projectFiles.audio.map(file => file.name)),
-        this.deleteFile('slide-images', projectFiles.images.map(file => file.name))
+        this.deleteFile(
+          "audio-files",
+          projectFiles.audio.map((file) => file.name)
+        ),
+        this.deleteFile(
+          "slide-images",
+          projectFiles.images.map((file) => file.name)
+        ),
       ]);
 
       return audioResult && imageResult;
     } catch (error) {
-      console.error('Ошибка в deleteProjectFiles:', error);
+      console.error("Ошибка в deleteProjectFiles:", error);
       return false;
     }
   }
@@ -471,30 +503,30 @@ export class StorageService {
   ): Promise<{ path: string; url: string } | null> {
     try {
       const timestamp = Date.now();
-      const fileExtension = file.name.split('.').pop();
+      const fileExtension = file.name.split(".").pop();
       const fileName = `tracks/${timestamp}.${fileExtension}`;
 
-      const uploadResult = await this.uploadFile('audios', {
+      const uploadResult = await this.uploadFile("audios", {
         file,
         path: fileName,
         options: {
-          cacheControl: '3600',
-          upsert: false
-        }
+          cacheControl: "3600",
+          upsert: false,
+        },
       });
 
       if (!uploadResult) {
         return null;
       }
 
-      const publicUrl = this.getPublicUrl('audios', uploadResult.path);
+      const publicUrl = this.getPublicUrl("audios", uploadResult.path);
 
       return {
         path: uploadResult.path,
-        url: publicUrl
+        url: publicUrl,
       };
     } catch (error) {
-      console.error('Ошибка в uploadTrackAudio:', error);
+      console.error("Ошибка в uploadTrackAudio:", error);
       return null;
     }
   }
@@ -507,30 +539,30 @@ export class StorageService {
   ): Promise<{ path: string; url: string } | null> {
     try {
       const timestamp = Date.now();
-      const fileExtension = file.name.split('.').pop();
+      const fileExtension = file.name.split(".").pop();
       const fileName = `tracks/${timestamp}.${fileExtension}`;
 
-      const uploadResult = await this.uploadFile('photos', {
+      const uploadResult = await this.uploadFile("photos", {
         file,
         path: fileName,
         options: {
-          cacheControl: '3600',
-          upsert: false
-        }
+          cacheControl: "3600",
+          upsert: false,
+        },
       });
 
       if (!uploadResult) {
         return null;
       }
 
-      const publicUrl = this.getPublicUrl('photos', uploadResult.path);
+      const publicUrl = this.getPublicUrl("photos", uploadResult.path);
 
       return {
         path: uploadResult.path,
-        url: publicUrl
+        url: publicUrl,
       };
     } catch (error) {
-      console.error('Ошибка в uploadTrackImage:', error);
+      console.error("Ошибка в uploadTrackImage:", error);
       return null;
     }
   }
