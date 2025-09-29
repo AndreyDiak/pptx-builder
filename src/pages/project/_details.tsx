@@ -40,6 +40,25 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
               ) : null,
             ],
             [
+              "Расположение чипа с номером трека",
+              project.chip_position            ],
+            [
+              "Расположение изображения автора",
+              project.author_image_position
+            ],
+            [
+              "Кнопка открытия первой страницы",
+              project.first_page_open_key
+            ],
+            [
+              "Кнопка открытия страницы с треками",
+              project.tracks_page_open_key
+            ],
+            [
+              "Кнопка открытия последней страницы",
+              project.last_page_open_key
+            ],
+            [
               "Готовность",
               project.status === "editing" ? (
                 <span
@@ -58,7 +77,7 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
           ]}
           size="lg"
           alignValues="left"
-          labelWidth={180}
+          labelWidth={300}
           className="max-w-md"
         />
         {project.front_page_background_src && (
@@ -88,3 +107,4 @@ const progressToColorMap: Record<number, string> = {
   75: "bg-blue-500",
   100: "text-green-500",
 };
+
