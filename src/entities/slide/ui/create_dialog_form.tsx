@@ -264,7 +264,7 @@ export const CreateTrackDialogForm = ({
         </FormField>
         <FormField
           name="image_src"
-          label="Фоновое изображение"
+          label="Изображение автора"
           useController
           help="Нельзя загружать изображения с весом больше 5 МБ"
         >

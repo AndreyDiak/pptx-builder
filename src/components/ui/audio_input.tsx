@@ -352,37 +352,11 @@ export const AudioInput = ({
           // Продолжаем к MediaRecorder
         }
 
-        onTrimProgress?.(40); // 40% - MediaRecorder
-        try {
-          // Добавляем таймаут для MediaRecorder
-          const mp3Blob = (await Promise.race([
-            audioBufferToMp3WithMediaRecorder(buffer),
-            new Promise((_, reject) =>
-              setTimeout(
-                () => reject(new Error("MediaRecorder timeout")),
-                30000
-              )
-            ),
-          ])) as Blob;
-
-          const trimmedFile = new File(
-            [mp3Blob],
-            originalName.replace(/\.[^/.]+$/, "_trimmed.mp3"),
-            { type: "audio/mpeg" }
-          );
-
-          // Проверяем качество созданного файла
-          const isValid = await validateAudioFile(trimmedFile);
-          if (isValid) {
-            return trimmedFile;
-          }
-        } catch (mediaRecorderError) {
-          // Fallback к WAV
-        }
+        // Пропускаем MediaRecorder и сразу переходим к WAV
       }
 
       // Fallback: создаем WAV файл
-      onTrimProgress?.(60); // 60% - WAV кодирование
+      onTrimProgress?.(40); // 40% - WAV кодирование
       const length = buffer.length;
       const numberOfChannels = buffer.numberOfChannels;
       const sampleRate = buffer.sampleRate;
@@ -434,12 +408,12 @@ export const AudioInput = ({
         { type: "audio/wav" }
       );
 
-      onTrimProgress?.(80); // 80% - валидация
+      onTrimProgress?.(70); // 70% - валидация
 
       // Проверяем качество WAV файла
       const isValid = await validateAudioFile(wavFile);
       if (isValid) {
-        onTrimProgress?.(90); // 90% - готово
+        onTrimProgress?.(100); // 100% - готово
         return wavFile;
       }
 
