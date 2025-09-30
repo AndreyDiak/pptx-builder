@@ -15,76 +15,97 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
 
   return (
     <div className={cn("", className)} {...rest}>
-      <h2 className="text-lg font-medium">Детали проекта</h2>
+      <h2 className="text-xl font-medium">Детали проекта</h2>
       <div className="mt-6">
         <div className="text-muted-foreground text-sm mb-4">
           {project.description}
         </div>
-        <PairList
-          pairs={[
-            [
-              "Создан",
-              <DateDisplay date={project.created_at} mode="absolute" />,
-            ],
-            [
-              "Обновлен",
-              project.updated_at ? (
-                <DateDisplay date={project.updated_at} mode="relative" />
-              ) : null,
-            ],
-            ["Количество треков", project.size_x * project.size_y],
-            [
-              "Крайний срок",
-              project.status === "editing" && project.deadline ? (
-                <DateDisplay date={project.deadline} mode="absolute" />
-              ) : null,
-            ],
-            [
-              "Расположение чипа с номером трека",
-              project.chip_position            ],
-            [
-              "Расположение изображения автора",
-              project.author_image_position
-            ],
-            [
-              "Кнопка открытия первой страницы",
-              project.first_page_open_key
-            ],
-            [
-              "Кнопка открытия страницы с треками",
-              project.tracks_page_open_key
-            ],
-            [
-              "Кнопка открытия последней страницы",
-              project.last_page_open_key
-            ],
-            [
-              "Готовность",
-              project.status === "editing" ? (
-                <span
-                  className={cn(
-                    progressToColorMap[
-                      Math.round(((slidesCount / total) * 100) / 25) * 25
-                    ]
-                  )}
-                >
-                  {((slidesCount / total) * 100).toFixed(0)}%
-                </span>
-              ) : (
-                "Завершен"
-              ),
-            ],
-          ]}
-          size="lg"
-          alignValues="left"
-          labelWidth={300}
-          className="max-w-md"
-        />
+        <div className="flex flex-col gap-4">
+          <PairList
+            pairs={[
+              [
+                "Создан",
+                <DateDisplay date={project.created_at} mode="absolute" />,
+              ],
+              [
+                "Обновлен",
+                project.updated_at ? (
+                  <DateDisplay date={project.updated_at} mode="relative" />
+                ) : null,
+              ],
+              ["Количество треков", project.size_x * project.size_y],
+              [
+                "Крайний срок",
+                project.status === "editing" && project.deadline ? (
+                  <DateDisplay date={project.deadline} mode="absolute" />
+                ) : null,
+              ],
+              [
+                "Готовность",
+                project.status === "editing" ? (
+                  <span
+                    className={cn(
+                      progressToColorMap[
+                        Math.round(((slidesCount / total) * 100) / 25) * 25
+                      ]
+                    )}
+                  >
+                    {((slidesCount / total) * 100).toFixed(0)}%
+                  </span>
+                ) : (
+                  "Завершен"
+                ),
+              ],
+            ]}
+            size="lg"
+            alignValues="left"
+            labelWidth={300}
+            className="max-w-md"
+          />
+          <Separator />
+          <div>
+            <h2 className="text-xl font-medium mb-2">Управление</h2>
+            <div className="text-muted-foreground text-sm mb-4">
+              Назначенные клавиши для управления презентацией
+            </div>
+            <PairList
+              pairs={[
+                ["Открыть первую страницу", project.first_page_open_key],
+                ["Открыть страницу с треками", project.tracks_page_open_key],
+                ["Открыть последнюю страницу", project.last_page_open_key],
+              ]}
+              labelWidth={300}
+              size="lg"
+            />
+          </div>
+          <Separator />
+          <div>
+            <h2 className="text-xl font-medium mb-2">Расположение элементов</h2>
+            <div className="text-muted-foreground text-sm mb-4"></div>
+            <PairList
+              pairs={[
+                [
+                  "Номер трека",
+                  positionToLabelMap[project.chip_position ?? "top-left"],
+                ],
+                [
+                  "Изображение автора",
+                  positionToLabelMap[
+                    project.author_image_position ?? "bottom-right"
+                  ],
+                ],
+              ]}
+              labelWidth={300}
+              size="lg"
+            />
+          </div>
+        </div>
+
         {project.front_page_background_src && (
           <Fragment>
             <Separator className="my-4" />
             <div>
-              <h2 className="text-base font-medium mb-2">
+              <h2 className="text-xl font-medium mb-2">
                 Титульное изображение
               </h2>
               <img
@@ -108,3 +129,9 @@ const progressToColorMap: Record<number, string> = {
   100: "text-green-500",
 };
 
+const positionToLabelMap: Record<string, string> = {
+  "top-left": "Верхний левый угол",
+  "top-right": "Верхний правый угол",
+  "bottom-left": "Нижний левый угол",
+  "bottom-right": "Нижний правый угол",
+};

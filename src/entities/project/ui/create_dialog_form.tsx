@@ -154,7 +154,9 @@ export const CreateProjectDialogForm = ({
     <Fragment>
       <DialogHeader>
         <DialogTitle className="text-2xl font-semibold">
-          {edit ? "Редактировать проект" : "Создать проект"}
+          {edit
+            ? `Редактировать - ${propsDefaultValues?.name}`
+            : "Создать проект"}
         </DialogTitle>
         <DialogDescription className="text-muted-foreground mt-2">
           {edit

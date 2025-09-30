@@ -4,9 +4,30 @@ import type { Track } from "@/entities/slide";
 // Импорт статических ассетов как base64
 import chipImageUrl from '/chip.png?url';
 import menuBackgroundImageUrl from '/menu_background.png?url';
+import comicSansUrl from '/src/assets/comis_sans.ttf?url';
+import underlayBackgroundImageUrl from '/underlay_background.png?url';
 
 // Кэш для статических ассетов в base64
 let staticAssetsCache: Map<string, string> | null = null;
+let comicSansBase64: string | null = null;
+
+// Функция для получения Comic Sans в base64
+async function getComicSansBase64(): Promise<string> {
+  if (comicSansBase64) {
+    return comicSansBase64;
+  }
+
+  try {
+    const response = await fetch(comicSansUrl);
+    const blob = await response.blob();
+    comicSansBase64 = await blobToBase64(blob);
+    console.log('Comic Sans шрифт загружен в base64');
+    return comicSansBase64;
+  } catch (error) {
+    console.error('Ошибка загрузки Comic Sans шрифта:', error);
+    return '';
+  }
+}
 
 // Функция для получения статических ассетов в base64
 async function getStaticAssetsBase64(): Promise<Map<string, string>> {
@@ -28,6 +49,12 @@ async function getStaticAssetsBase64(): Promise<Map<string, string>> {
     const menuBlob = await menuResponse.blob();
     const menuBase64 = await blobToBase64(menuBlob);
     cache.set('/menu_background.png', menuBase64);
+    
+    // Загружаем underlay_background.png
+    const underlayResponse = await fetch(underlayBackgroundImageUrl);
+    const underlayBlob = await underlayResponse.blob();
+    const underlayBase64 = await blobToBase64(underlayBlob);
+    cache.set('/underlay_background.png', underlayBase64);
     
     staticAssetsCache = cache;
     console.log('Статические ассеты загружены в base64');
@@ -74,6 +101,11 @@ async function downloadFile(url: string): Promise<Blob> {
       const response = await fetch(menuBackgroundImageUrl);
       const blob = await response.blob();
       console.log(`Статический файл menu_background.png загружен, размер: ${blob.size} байт`);
+      return blob;
+    } else if (url === '/underlay_background.png') {
+      const response = await fetch(underlayBackgroundImageUrl);
+      const blob = await response.blob();
+      console.log(`Статический файл underlay_background.png загружен, размер: ${blob.size} байт`);
       return blob;
     }
     
@@ -149,7 +181,8 @@ export async function generatePresentationZIP(data: PresentationData): Promise<B
     // Статические ассеты из public
     fileUrls.add('/chip.png');
     fileUrls.add('/menu_background.png');
-    console.log('Добавлены статические ассеты: chip.png, menu_background.png');
+    fileUrls.add('/underlay_background.png');
+    console.log('Добавлены статические ассеты: chip.png, menu_background.png, underlay_background.png');
     
     // Изображения и аудио треков
     tracks.forEach((track, index) => {
@@ -194,6 +227,9 @@ export async function generatePresentationZIP(data: PresentationData): Promise<B
         } else if (url === '/menu_background.png') {
           fileName = 'menu_background.png';
           targetFolder = assetsFolder || null;
+        } else if (url === '/underlay_background.png') {
+          fileName = 'underlay_background.png';
+          targetFolder = assetsFolder || null;
         } else {
           fileName = generateFileName(url, 'photo', photoIndex++);
           targetFolder = photosFolder || null;
@@ -223,7 +259,7 @@ export async function generatePresentationZIP(data: PresentationData): Promise<B
     // Генерируем HTML с локальными путями
     console.log('Генерация HTML с локальными путями');
     console.log(`Карта файлов содержит ${fileMap.size} записей`);
-    const htmlContent = generatePresentationHTML(data, fileMap);
+    const htmlContent = await generatePresentationHTML(data, fileMap);
     
     // Добавляем HTML файл в корень архива
     zip.file('presentation.html', htmlContent);
@@ -277,6 +313,7 @@ export async function generatePresentationHTMLWithAssets(data: PresentationData)
     // Статические ассеты из public
     fileUrls.add('/chip.png');
     fileUrls.add('/menu_background.png');
+    fileUrls.add('/underlay_background.png');
     
     // Изображения и аудио треков
     tracks.forEach(track => {
@@ -303,7 +340,7 @@ export async function generatePresentationHTMLWithAssets(data: PresentationData)
     for (const url of fileUrls) {
       try {
         // Пропускаем статические ассеты, они уже добавлены
-        if (url === '/chip.png' || url === '/menu_background.png') {
+        if (url === '/chip.png' || url === '/menu_background.png' || url === '/underlay_background.png') {
           continue;
         }
         
@@ -326,73 +363,22 @@ export async function generatePresentationHTMLWithAssets(data: PresentationData)
     }
     
     // Генерируем HTML с встроенными ассетами
-    return generatePresentationHTML(data, fileMap);
+    return await generatePresentationHTML(data, fileMap);
   } catch (error) {
     console.error('Ошибка создания HTML с ассетами:', error);
     throw new Error(`Ошибка создания HTML: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
   }
 }
 
-// Тестовая функция для проверки работы генератора
-export function testPresentationGenerator() {
-  console.log('Тестирование генератора презентации...');
-  
-  // Создаем тестовые данные
-  const testProject: Project = {
-    id: 1,
-    name: 'Тестовый проект',
-    size_x: 3,
-    size_y: 3,
-    front_page_background_src: 'https://example.com/background.jpg',
-    track_ids: [1, 2, 3],
-    status: 'completed',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    deadline: null,
-    description: null
-  };
-  
-  const testTracks: Track[] = [
-    {
-      id: 1,
-      name: 'Тестовый трек 1',
-      author: 'Тестовый автор 1',
-      audio_src: 'https://example.com/audio1.mp3',
-      image_src: 'https://example.com/image1.jpg',
-      index: 1,
-      project_id: 1,
-      created_at: new Date().toISOString(),
-      updated_at: null
-    }
-  ];
-  
-  console.log('Тестовые данные созданы:', { testProject, testTracks });
-  return { testProject, testTracks };
-}
 
-// Тестовая функция для проверки статических ассетов
-export async function testStaticAssets() {
-  try {
-    console.log('Тестирование статических ассетов...');
-    const staticAssets = await getStaticAssetsBase64();
-    console.log('Статические ассеты загружены:', staticAssets.size);
-    
-    for (const [url, base64] of staticAssets) {
-      console.log(`Ассет: ${url}, размер base64: ${base64.length} символов`);
-    }
-    
-    return staticAssets;
-  } catch (error) {
-    console.error('Ошибка тестирования статических ассетов:', error);
-    return new Map();
-  }
-}
-
-export function generatePresentationHTML(data: PresentationData, fileMap?: Map<string, string>): string {
+export async function generatePresentationHTML(data: PresentationData, fileMap?: Map<string, string>): Promise<string> {
   const { project, tracks } = data;
   
   // Сортируем треки по индексу
   const sortedTracks = tracks.sort((a, b) => a.index - b.index);
+  
+  // Получаем Comic Sans в base64
+  const comicSansBase64 = await getComicSansBase64();
   
   // Функция для получения локального пути к файлу
   const getLocalPath = (url: string | null): string => {
@@ -410,6 +396,13 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>МУЗ ЛОТО: ${project.name}</title>
     <style>
+        @font-face {
+            font-family: 'Comic Sans';
+            src: url('data:font/truetype;charset=utf-8;base64,${comicSansBase64}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -457,10 +450,12 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
         }
 
         .title-overlay {
-            background: #32CD32;
+            background: #92d050;
             border: 3px solid #FFD700;
-            border-radius: 15px;
-            padding: 30px 50px;
+            min-width: 64rem;
+            padding: 48px 0 48px 0;
+            border-radius: 32px;
+            text-transform: uppercase;
             text-align: center;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
@@ -469,32 +464,34 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
             color: white;
             font-size: 4rem;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            text-shadow: 
+                2px 2px 0px #FFD700,
+                4px 4px 8px rgba(0,0,0,0.7),
+                0 0 10px rgba(255, 215, 0, 0.3);
             line-height: 1.2;
         }
 
         /* Главный экран */
         .main-page {
             background-image: url('${getLocalPath('/menu_background.png')}');
-            background-color: #1a1a1a;
+            background-color: #92d050;
         }
 
         .grid-container {
             display: grid;
             grid-template-columns: repeat(${project.size_x}, 1fr);
             grid-template-rows: repeat(${project.size_y}, 1fr);
-            gap: 15px;
-            max-width: ${project.size_x * 220}px;
-            max-height: ${project.size_y * 120}px;
+            gap: 20px;
+            max-width: ${project.size_x * 280}px;
+            max-height: ${project.size_y * 150}px;
             width: 100%;
             height: 100%;
-            padding: 20px;
+            padding: 30px;
         }
 
         .track-card {
-            background: white;
-            border: 2px solid #FFD700;
-            border-radius: 8px;
+            border: none;
+            border-radius: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -502,21 +499,57 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            min-height: 100px;
-            max-width: 200px;
-            max-height: 100px;
+            min-height: 120px;
+            min-width: 200px;
             user-select: none;
+            padding: 20px;
+        }
+
+        .track-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background-image: url('${getLocalPath('/chip.png')}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 1;
+        }
+
+        .track-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 100px;
+            background-image: url('${getLocalPath('/underlay_background.png')}');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 2;
         }
 
         .track-card:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
         }
 
         .track-card.played {
-            background: #f0f0f0;
             opacity: 0.7;
             cursor: not-allowed;
+        }
+
+        .track-card.played::before {
+            display: none;
+        }
+
+        .track-card.played::after {
+            display: none;
         }
 
         .track-card.played:hover {
@@ -524,50 +557,33 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
             box-shadow: none;
         }
 
-        .headphone-icon {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
-            background: #FFD700;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #8B008B;
-            border: 2px solid #8B008B;
-        }
-
         .track-name {
             color: #DC143C;
+            font-family: 'Comic Sans', cursive;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1.6rem;
             text-align: center;
             padding: 5px;
             line-height: 1.1;
-        }
-
-        .track-number {
-            color: #666;
-            font-weight: bold;
-            font-size: 1.2rem;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 3;
         }
 
         /* Страница трека */
         .track-page {
             background-image: url('${getLocalPath(project.front_page_background_src)}');
             background-color: #1a1a1a;
+            position: relative;
         }
+
 
         .track-index {
             position: absolute;
             top: 30px;
             left: 30px;
-            width: 80px;
-            height: 80px;
+            width: 33vh;
+            height: 33vh;
             background-image: url('${getLocalPath('/chip.png')}');
             background-size: contain;
             background-repeat: no-repeat;
@@ -575,20 +591,22 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            font-family: 'Comic Sans', cursive;
+            font-size: 10rem;
+            font-weight: 900;
+            color: #123940;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.9);
+            transform: rotate(-8deg);
+            letter-spacing: -2px;
+            z-index: 3;
         }
 
         .author-image {
             position: absolute;
-            bottom: 30px;
-            right: 30px;
-            width: 200px;
-            height: 200px;
-            border-radius: 10px;
-            border: 3px solid #FFD700;
+            bottom: 0;
+            right: 0;
+            width: 33vw;
+            height: 55vh;
             object-fit: cover;
         }
 
@@ -597,22 +615,19 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.7);
-            padding: 20px 40px;
-            border-radius: 10px;
-            border: 2px solid #FFD700;
             text-align: center;
+            z-index: 2;
         }
 
         .track-title h2 {
-            color: #FFD700;
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .track-title p {
-            color: white;
-            font-size: 1.2rem;
+            color: #DC143C;
+            font-family: 'Comic Sans', cursive;
+            font-size: 80px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            line-height: 1.1;
+            margin: 0;
+            max-width: 600px;
         }
 
         /* Финальная страница */
@@ -621,19 +636,24 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
         }
 
         .congratulations-overlay {
-            background: #32CD32;
+            background: #92d050;
             border: 3px solid #FFD700;
-            border-radius: 15px;
-            padding: 40px 60px;
+            border-radius: 32px;
+            padding: 48px 0 48px 0;
+            min-width: 64rem;
             text-align: center;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            text-transform: uppercase;
         }
 
         .congratulations-text {
             color: white;
-            font-size: 2.5rem;
+            font-size: 4rem;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            text-shadow: 
+                2px 2px 0px #FFD700,
+                4px 4px 8px rgba(0,0,0,0.7),
+                0 0 10px rgba(255, 215, 0, 0.3);
             line-height: 1.2;
         }
 
@@ -678,9 +698,6 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
         <div class="grid-container">
             ${generateTrackCards(sortedTracks, project.size_x, project.size_y)}
         </div>
-        <div style="position: absolute; bottom: 20px; left: 20px; color: rgba(255,255,255,0.7); font-size: 14px;">
-            [S] или [Ы] - главная | [Q] или [Й] - поздравление | [R] или [К] - сброс
-        </div>
     </div>
 
     <!-- Страница трека -->
@@ -688,13 +705,9 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
         <div class="track-index" id="track-index">1</div>
         <div class="track-title" id="track-title">
             <h2 id="track-name">Название трека</h2>
-            <p id="track-author">Автор</p>
         </div>
         <img class="author-image" id="author-image" src="" alt="Автор">
         <audio id="track-audio" autoplay></audio>
-        <div style="position: absolute; bottom: 20px; left: 20px; color: rgba(255,255,255,0.7); font-size: 14px;">
-            [S] или [Ы] - главная | [M] или [М] - меню | [Esc] - назад
-        </div>
     </div>
 
     <!-- Финальная страница -->
@@ -704,9 +717,6 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
                 ПОЗДРАВЛЯЕМ<br>
                 ПОБЕДИТЕЛЕЙ!
             </div>
-        </div>
-        <div style="position: absolute; bottom: 20px; left: 20px; color: rgba(255,255,255,0.7); font-size: 14px;">
-            [S] или [Ы] - вернуться на главную
         </div>
     </div>
 
@@ -735,11 +745,6 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
             setTimeout(() => {
                 updateTrackCards();
                 setupEventListeners();
-                
-                // Автоматический переход на главную страницу через 3 секунды
-                setTimeout(() => {
-                    showPage('main-page');
-                }, 3000);
             }, 100);
         });
 
@@ -782,13 +787,15 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
             document.addEventListener('keydown', (e) => {
                 const key = e.key.toLowerCase();
                 
-                // Клавиша M (русская М или английская M)
-                if ((key === 'm' || key === 'м') && currentPage === 'track-page') {
-                    showPage('main-page');
+                // Клавиша M (русская М или английская M) - переход в главное меню
+                if (key === 'm' || key === 'м') {
+                    if (currentPage === 'track-page' || currentPage === 'first-page' || currentPage === 'final-page') {
+                        showPage('main-page');
+                    }
                 } 
-                // Клавиша S (русская Ы или английская S) - возврат на главную с любой страницы
+                // Клавиша S (русская Ы или английская S) - возврат на титульную страницу
                 else if (key === 's' || key === 'ы') {
-                    showPage('main-page');
+                    showPage('first-page');
                 }
                 // Клавиша Q (русская Й или английская Q)
                 else if ((key === 'q' || key === 'й') && currentPage === 'main-page') {
@@ -857,7 +864,6 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
             // Обновить информацию о треке
             document.getElementById('track-index').textContent = track.index;
             document.getElementById('track-name').textContent = track.name || 'Неизвестный трек';
-            document.getElementById('track-author').textContent = track.author || 'Неизвестный автор';
             
             // Установить изображение автора
             const authorImage = document.getElementById('author-image');
@@ -874,7 +880,12 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
             if (track.audio_src) {
                 const localAudioPath = getLocalPath(track.audio_src);
                 audio.src = localAudioPath;
-                audio.play().catch(e => console.log('Не удалось воспроизвести аудио:', e));
+                // Попытка воспроизведения с обработкой ошибок
+                audio.play().catch(e => {
+                    console.log('Автовоспроизведение заблокировано браузером:', e);
+                    // Показываем уведомление пользователю
+                    showAudioPlayMessage();
+                });
             }
 
             showPage('track-page');
@@ -887,8 +898,28 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
                     const track = presentationData.tracks[index];
                     if (track) {
                         card.innerHTML = \`
-                            <div class="headphone-icon">🎧</div>
-                            <div class="track-number">\${track.index}</div>
+                            <div style="
+                                width: 100px;
+                                height: 100px;
+                                min-width: 100px;
+                                min-height: 100px;
+                                background-image: url('\${getLocalPath('/chip.png')}');
+                                background-size: contain;
+                                background-repeat: no-repeat;
+                                background-position: center;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-family: 'Comic Sans', cursive;
+                                font-size: 2.5rem;
+                                font-weight: 900;
+                                color: #123940;
+                                text-shadow: 1px 1px 3px rgba(255,255,255,0.9);
+                                transform: rotate(-8deg);
+                                letter-spacing: -2px;
+                            ">
+                                \${track.index}
+                            </div>
                         \`;
                     }
                 }
@@ -901,6 +932,48 @@ export function generatePresentationHTML(data: PresentationData, fileMap?: Map<s
                 playedTracks.push(currentTrackIndex);
                 localStorage.setItem('playedTracks', JSON.stringify(playedTracks));
                 updateTrackCards();
+            }
+        }
+
+        // Функция для показа сообщения о необходимости клика для воспроизведения
+        function showAudioPlayMessage() {
+            const trackPage = document.getElementById('track-page');
+            if (trackPage) {
+                // Создаем сообщение
+                let message = document.getElementById('audio-play-message');
+                if (!message) {
+                    message = document.createElement('div');
+                    message.id = 'audio-play-message';
+                    message.style.cssText = \`
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0,0,0,0.8);
+                        color: white;
+                        padding: 20px 40px;
+                        border-radius: 10px;
+                        border: 2px solid #FFD700;
+                        text-align: center;
+                        z-index: 10;
+                        cursor: pointer;
+                        font-size: 1.2rem;
+                    \`;
+                    message.textContent = 'Кликните для воспроизведения аудио';
+                    trackPage.appendChild(message);
+                    
+                    // Обработчик клика для запуска аудио
+                    message.addEventListener('click', function() {
+                        const audio = document.getElementById('track-audio');
+                        if (audio) {
+                            audio.play().then(() => {
+                                message.remove();
+                            }).catch(e => {
+                                console.log('Ошибка воспроизведения:', e);
+                            });
+                        }
+                    });
+                }
             }
         }
 
@@ -926,14 +999,12 @@ function generateTrackCards(tracks: Track[], sizeX: number, sizeY: number): stri
     if (track) {
       html += `
         <div class="track-card" data-track-index="${i}">
-          <div class="headphone-icon">🎧</div>
-          <div class="track-name">${track.name || 'Неизвестный трек'}</div>
+          <div class="track-name">${track.author || 'Неизвестная группа'}</div>
         </div>
       `;
     } else {
       html += `
         <div class="track-card" style="opacity: 0.3;">
-          <div class="headphone-icon">🎧</div>
           <div class="track-name">Пусто</div>
         </div>
       `;
