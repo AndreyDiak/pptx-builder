@@ -16,9 +16,17 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['lamejs']
+    include: ['lamejs'],
+    force: true
   },
   define: {
     global: 'globalThis',
+  },
+  build: {
+    commonjsOptions: {
+      include: [/lamejs/, /node_modules/],
+      transformMixedEsModules: true,
+      strictRequires: true
+    }
   },
 })
