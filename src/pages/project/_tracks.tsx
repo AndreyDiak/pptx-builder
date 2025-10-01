@@ -87,7 +87,10 @@ const TracksHeaderLayout = ({
             + Добавить трек
           </Button>
         </DialogTrigger>
-        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
+        <DialogContent
+          onInteractOutside={(e) => e.preventDefault()}
+          className="w-[540px] overflow-y-auto custom-scrollbar dialog-max-height"
+        >
           <CreateTrackDialogForm projectId={projectId} />
         </DialogContent>
       </Dialog>

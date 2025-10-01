@@ -91,7 +91,7 @@ export function ImagePicker({
               <p className="text-gray-600 text-sm">Нет доступных изображений</p>
             </div>
           ) : (
-            <div className="grid grid-cols-4 gap-4 h-full max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 scroll-smooth">
+            <div className="grid grid-cols-4 gap-4 h-full max-h-[400px] overflow-y-auto pr-2 custom-scrollbar scroll-smooth">
               {images.map((imageUrl, index) => (
                 <div
                   key={index}

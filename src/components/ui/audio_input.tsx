@@ -53,16 +53,19 @@ export const AudioInput = ({
       const dest = audioContext.createMediaStreamDestination();
       source.connect(dest);
 
-      // Пытаемся использовать MP3 кодек
-      let mimeType = "audio/mp4"; // fallback
-      if (MediaRecorder.isTypeSupported("audio/mpeg")) {
-        mimeType = "audio/mpeg";
-      } else if (MediaRecorder.isTypeSupported("audio/mp4")) {
-        mimeType = "audio/mp4";
+      // Пытаемся использовать лучший доступный кодек
+      let mimeType = "audio/webm;codecs=opus"; // лучший fallback
+      if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+        mimeType = "audio/webm;codecs=opus";
       } else if (MediaRecorder.isTypeSupported("audio/webm")) {
         mimeType = "audio/webm";
+      } else if (MediaRecorder.isTypeSupported("audio/mp4")) {
+        mimeType = "audio/mp4";
+      } else if (MediaRecorder.isTypeSupported("audio/mpeg")) {
+        mimeType = "audio/mpeg";
       }
 
+      console.log("Используем MediaRecorder с типом:", mimeType);
       const mediaRecorder = new MediaRecorder(dest.stream, { mimeType });
 
       return new Promise((resolve, reject) => {
@@ -96,9 +99,19 @@ export const AudioInput = ({
   );
 
   const audioBufferToMp3 = useCallback((buffer: AudioBuffer): Blob => {
+    console.log("Начинаем MP3 кодирование...");
     const sampleRate = buffer.sampleRate;
     const numberOfChannels = buffer.numberOfChannels;
     const length = buffer.length;
+
+    console.log("Параметры аудио:", { sampleRate, numberOfChannels, length });
+
+    // Используем оригинальные параметры - ваш форк должен их поддерживать
+    console.log("Используем параметры:", {
+      numberOfChannels,
+      sampleRate,
+      bitrate: 128,
+    });
 
     // Создаем массив для левого и правого каналов
     const leftChannel = new Int16Array(length);
@@ -110,6 +123,7 @@ export const AudioInput = ({
         -32768,
         Math.min(32767, buffer.getChannelData(0)[i] * 32768)
       );
+
       if (numberOfChannels > 1) {
         rightChannel[i] = Math.max(
           -32768,
@@ -121,37 +135,47 @@ export const AudioInput = ({
     }
 
     // Проверяем, что lamejs доступен
+    console.log("Проверяем lamejs:", lamejs);
     if (!lamejs || !lamejs.Mp3Encoder) {
       throw new Error("lamejs не загружен или Mp3Encoder недоступен");
     }
 
-    // Проверяем и инициализируем MPEGMode если нужно
-    if (typeof (window as any).MPEGMode === "undefined") {
-      (window as any).MPEGMode = {
-        STEREO: 0,
-        JOINT_STEREO: 1,
-        DUAL_CHANNEL: 2,
-        MONO: 3,
-      };
-    }
+    // Ваш форк lamejs должен работать без глобальных переменных
 
     // Создаем MP3 энкодер
+    console.log("Создаем MP3 энкодер...");
     const mp3encoder = new lamejs.Mp3Encoder(numberOfChannels, sampleRate, 128); // 128 kbps
+    console.log("MP3 энкодер создан успешно");
     const mp3Data: Int8Array[] = [];
 
     // Кодируем по блокам
     const blockSize = 1152; // Стандартный размер блока для MP3
+    console.log("Начинаем кодирование по блокам, размер блока:", blockSize);
+
     for (let i = 0; i < length; i += blockSize) {
       const leftChunk = leftChannel.subarray(i, i + blockSize);
       const rightChunk = rightChannel.subarray(i, i + blockSize);
 
-      const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
-      if (mp3buf.length > 0) {
-        mp3Data.push(mp3buf);
+      try {
+        const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+        if (mp3buf.length > 0) {
+          mp3Data.push(mp3buf);
+        }
+        console.log(
+          `Закодирован блок ${i / blockSize + 1}/${Math.ceil(
+            length / blockSize
+          )}, размер: ${mp3buf.length}`
+        );
+      } catch (error) {
+        console.error(`Ошибка кодирования блока ${i / blockSize + 1}:`, error);
+        throw error;
       }
     }
 
+    console.log("Кодирование завершено, блоков:", mp3Data.length);
+
     // Завершаем кодирование
+    console.log("Завершаем кодирование...");
     const finalMp3buf = mp3encoder.flush();
     if (finalMp3buf.length > 0) {
       mp3Data.push(finalMp3buf);
@@ -159,6 +183,8 @@ export const AudioInput = ({
 
     // Объединяем все блоки
     const totalLength = mp3Data.reduce((acc, chunk) => acc + chunk.length, 0);
+    console.log("Общий размер MP3:", totalLength, "байт");
+
     const mp3Buffer = new Uint8Array(totalLength);
     let offset = 0;
 
@@ -167,7 +193,9 @@ export const AudioInput = ({
       offset += chunk.length;
     }
 
-    return new Blob([mp3Buffer], { type: "audio/mpeg" });
+    const blob = new Blob([mp3Buffer], { type: "audio/mpeg" });
+    console.log("MP3 Blob создан, размер:", blob.size, "байт");
+    return blob;
   }, []);
 
   const processFile = useCallback(
@@ -303,15 +331,25 @@ export const AudioInput = ({
   const validateAudioFile = useCallback(
     async (file: File): Promise<boolean> => {
       return new Promise((resolve) => {
+        console.log(
+          "Валидируем файл:",
+          file.name,
+          "размер:",
+          file.size,
+          "тип:",
+          file.type
+        );
         const audio = new Audio();
         const url = URL.createObjectURL(file);
 
         audio.addEventListener("loadedmetadata", () => {
+          console.log("Файл валиден, длительность:", audio.duration);
           URL.revokeObjectURL(url);
           resolve(true);
         });
 
-        audio.addEventListener("error", () => {
+        audio.addEventListener("error", (e) => {
+          console.error("Ошибка валидации файла:", e);
           URL.revokeObjectURL(url);
           resolve(false);
         });
@@ -336,7 +374,10 @@ export const AudioInput = ({
       ) {
         onTrimProgress?.(20); // 20% - начало кодирования
         try {
+          console.log("Пытаемся кодировать в MP3 через lamejs...");
           const mp3Blob = audioBufferToMp3(buffer);
+          console.log("MP3 кодирование успешно, размер:", mp3Blob.size, "байт");
+
           const trimmedFile = new File(
             [mp3Blob],
             originalName.replace(/\.[^/.]+$/, "_trimmed.mp3"),
@@ -346,10 +387,39 @@ export const AudioInput = ({
           // Проверяем качество созданного файла
           const isValid = await validateAudioFile(trimmedFile);
           if (isValid) {
+            console.log("MP3 файл валиден, используем его");
             return trimmedFile;
+          } else {
+            console.log("MP3 файл невалиден, переходим к MediaRecorder");
           }
         } catch (error) {
-          // Продолжаем к MediaRecorder
+          console.error("Ошибка MP3 кодирования:", error);
+          console.log("Пробуем MediaRecorder как fallback...");
+
+          try {
+            const mediaRecorderBlob = await audioBufferToMp3WithMediaRecorder(
+              buffer
+            );
+            console.log(
+              "MediaRecorder кодирование успешно, размер:",
+              mediaRecorderBlob.size,
+              "байт"
+            );
+
+            const trimmedFile = new File(
+              [mediaRecorderBlob],
+              originalName.replace(/\.[^/.]+$/, "_trimmed.webm"),
+              { type: "audio/webm" }
+            );
+
+            const isValid = await validateAudioFile(trimmedFile);
+            if (isValid) {
+              console.log("MediaRecorder файл валиден, используем его");
+              return trimmedFile;
+            }
+          } catch (mediaRecorderError) {
+            console.error("Ошибка MediaRecorder:", mediaRecorderError);
+          }
         }
 
         // Пропускаем MediaRecorder и сразу переходим к WAV

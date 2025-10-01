@@ -72,7 +72,7 @@ export const TrackCard = ({ track }: { track: Track }) => {
                     <Edit3 className="h-4 w-4" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="w-[540px] overflow-y-auto custom-scrollbar dialog-max-height">
                   <CreateTrackDialogForm
                     projectId={track.project_id}
                     defaultValues={{

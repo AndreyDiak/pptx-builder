@@ -5,7 +5,15 @@ declare module 'lamejs' {
     flush(): Int8Array;
   }
   
-  export = {
-    Mp3Encoder: Mp3Encoder
-  };
+  export class WavHeader {
+    dataOffset: number;
+    dataLen: number;
+    channels: number;
+    sampleRate: number;
+    static RIFF: number;
+    static WAVE: number;
+    static fmt_: number;
+    static data: number;
+    static readHeader(dataView: DataView): WavHeader | undefined;
+  }
 }

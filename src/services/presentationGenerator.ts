@@ -374,8 +374,8 @@ export async function generatePresentationHTMLWithAssets(data: PresentationData)
 export async function generatePresentationHTML(data: PresentationData, fileMap?: Map<string, string>): Promise<string> {
   const { project, tracks } = data;
   
-  // Сортируем треки по индексу
-  const sortedTracks = tracks.sort((a, b) => a.index - b.index);
+  // Перемешиваем треки для случайного порядка
+  const shuffledTracks = [...tracks].sort(() => Math.random() - 0.5);
   
   // Получаем Comic Sans в base64
   const comicSansBase64 = await getComicSansBase64();
@@ -605,9 +605,11 @@ export async function generatePresentationHTML(data: PresentationData, fileMap?:
             position: absolute;
             bottom: 0;
             right: 0;
-            width: 33vw;
-            height: 55vh;
-            object-fit: cover;
+            max-width: 50vw;
+            min-width: 35vw;
+            max-height: 65vh;
+            min-height: 45vh;
+            object-fit: contain;
         }
 
         .track-title {
@@ -696,7 +698,7 @@ export async function generatePresentationHTML(data: PresentationData, fileMap?:
     <!-- Главный экран -->
     <div class="page main-page" id="main-page">
         <div class="grid-container">
-            ${generateTrackCards(sortedTracks, project.size_x, project.size_y)}
+            ${generateTrackCards(shuffledTracks, project.size_x, project.size_y)}
         </div>
     </div>
 
@@ -722,7 +724,7 @@ export async function generatePresentationHTML(data: PresentationData, fileMap?:
 
     <script>
         // Данные презентации
-        const presentationData = ${JSON.stringify({ project, tracks: sortedTracks })};
+        const presentationData = ${JSON.stringify({ project, tracks: shuffledTracks })};
         const fileMap = ${fileMap ? JSON.stringify(Object.fromEntries(fileMap)) : 'null'};
         
         // Функция для получения локального пути к файлу

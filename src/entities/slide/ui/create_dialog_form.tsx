@@ -7,10 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileInput } from "@/components/ui/file_input";
 import { Form } from "@/components/ui/form";
 import { FormField } from "@/components/ui/form_field";
 import { FormSubmitButton } from "@/components/ui/form_submit_button";
+import { ImageUploadOrPicker } from "@/components/ui/image_upload_or_picker";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -50,6 +50,7 @@ export const CreateTrackDialogForm = ({
 }: Props) => {
   const edit = !!propsDefaultValues?.id;
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const audioFileRef = useRef<File | null>(null);
   const [isTrimming, setIsTrimming] = useState(false);
   const [trimProgress, setTrimProgress] = useState(0);
@@ -67,6 +68,10 @@ export const CreateTrackDialogForm = ({
     },
     [audioFile]
   );
+
+  const handleImageFileChange = useCallback((file: File | null) => {
+    setImageFile(file);
+  }, []);
 
   const handleEditorOpen = useCallback(() => {
     setIsTrimming(true);
@@ -133,34 +138,38 @@ export const CreateTrackDialogForm = ({
           audioSrc = audioResult.url;
         }
 
-        // Загружаем изображение, если оно есть и это новый файл
+        // Обрабатываем изображение
         if (data.image_src) {
-          // Если это строка (URL), используем как есть
-          if (
+          // Если есть новый файл изображения (из загрузки), загружаем его
+          if (imageFile) {
+            const imageResult = await StorageService.uploadTrackImage(
+              imageFile
+            );
+            if (!imageResult) {
+              throw new Error("Не удалось загрузить изображение");
+            }
+            imageSrc = imageResult.url;
+          }
+          // Если это строка (URL из галереи), используем как есть
+          else if (
             typeof data.image_src === "string" &&
             data.image_src.trim() !== ""
           ) {
             imageSrc = data.image_src;
           }
-          // Если это FileList, загружаем файл
+          // Если это File в data.image_src, загружаем файл
           else if (
-            typeof data.image_src === "object" &&
             data.image_src &&
-            "length" in data.image_src &&
-            "0" in data.image_src
+            typeof data.image_src === "object" &&
+            "name" in data.image_src
           ) {
-            const fileList = data.image_src as FileList;
-            if (fileList.length > 0) {
-              const imageResult = await StorageService.uploadTrackImage(
-                fileList[0]
-              );
-              if (!imageResult) {
-                throw new Error("Не удалось загрузить изображение");
-              }
-              imageSrc = imageResult.url;
-            } else {
-              imageSrc = null;
+            const imageResult = await StorageService.uploadTrackImage(
+              data.image_src as File
+            );
+            if (!imageResult) {
+              throw new Error("Не удалось загрузить изображение");
             }
+            imageSrc = imageResult.url;
           }
           // Если это пустой объект или что-то другое, устанавливаем null
           else {
@@ -262,23 +271,21 @@ export const CreateTrackDialogForm = ({
             </SelectContent>
           </Select>
         </FormField>
-        <FormField
-          name="image_src"
-          label="Изображение автора"
-          useController
-          help="Нельзя загружать изображения с весом больше 5 МБ"
-        >
+        <FormField name="image_src" label="Изображение автора" useController>
           {(props) => (
-            <FileInput
+            <ImageUploadOrPicker
               {...props}
-              accept="image/*"
-              maxFiles={1}
+              onFileChange={handleImageFileChange}
               placeholder="Перетащите изображение или загрузите"
-              showFileNames={true}
-              existingImageUrl={propsDefaultValues?.image_src || undefined}
+              maxSize={10} // 10MB для исходного файла
+              compressionOptions={{
+                quality: 0.85,
+                maxWidth: 1920,
+                maxHeight: 1080,
+              }}
               bucket="photos"
               folder="tracks"
-              defaultTab="upload"
+              existingImageUrl={propsDefaultValues?.image_src || undefined}
             />
           )}
         </FormField>
