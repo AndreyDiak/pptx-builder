@@ -1,0 +1,3 @@
+[submodule "lamejs"]
+	path = lamejs
+	url = https://github.com/AndreyDiak/lamejs.git

@@ -110,24 +110,25 @@ export const AudioInput = ({
     console.log("Используем параметры:", {
       numberOfChannels,
       sampleRate,
-      bitrate: 128,
+      bitrate: 320,
     });
 
-    // Создаем массив для левого и правого каналов
+    // Создаем массивы для левого и правого каналов
     const leftChannel = new Int16Array(length);
     const rightChannel = new Int16Array(length);
 
-    // Конвертируем float32 в int16
+    // Конвертируем float32 в int16 с сохранением стерео
     for (let i = 0; i < length; i++) {
-      leftChannel[i] = Math.max(
-        -32768,
-        Math.min(32767, buffer.getChannelData(0)[i] * 32768)
-      );
+      // Левый канал
+      const leftSample = buffer.getChannelData(0)[i];
+      leftChannel[i] = Math.max(-32768, Math.min(32767, leftSample * 32768));
 
+      // Правый канал (если есть, иначе дублируем левый)
       if (numberOfChannels > 1) {
+        const rightSample = buffer.getChannelData(1)[i];
         rightChannel[i] = Math.max(
           -32768,
-          Math.min(32767, buffer.getChannelData(1)[i] * 32768)
+          Math.min(32767, rightSample * 32768)
         );
       } else {
         rightChannel[i] = leftChannel[i]; // Моно в стерео
@@ -140,12 +141,18 @@ export const AudioInput = ({
       throw new Error("lamejs не загружен или Mp3Encoder недоступен");
     }
 
-    // Ваш форк lamejs должен работать без глобальных переменных
+    // Ваш форк lamejs должен работать без дополнительной инициализации
 
-    // Создаем MP3 энкодер
+    // Создаем MP3 энкодер с улучшенными параметрами качества
     console.log("Создаем MP3 энкодер...");
-    const mp3encoder = new lamejs.Mp3Encoder(numberOfChannels, sampleRate, 128); // 128 kbps
+    // Используем высокое качество: 320 kbps для лучшего звука
+    const mp3encoder = new lamejs.Mp3Encoder(numberOfChannels, 44100, 320); // Высокое качество
     console.log("MP3 энкодер создан успешно");
+    console.log("Параметры энкодера:", {
+      channels: numberOfChannels,
+      sampleRate: 44100,
+      bitrate: 320,
+    });
     const mp3Data: Int8Array[] = [];
 
     // Кодируем по блокам
@@ -366,7 +373,7 @@ export const AudioInput = ({
       const originalType = originalFile.type;
       const originalName = originalFile.name;
 
-      // Если это MP3, пытаемся сохранить как MP3
+      // Если это MP3, пытаемся сохранить как MP3 через lamejs
       if (
         originalType.includes("mp3") ||
         originalType.includes("mpeg") ||
@@ -421,8 +428,6 @@ export const AudioInput = ({
             console.error("Ошибка MediaRecorder:", mediaRecorderError);
           }
         }
-
-        // Пропускаем MediaRecorder и сразу переходим к WAV
       }
 
       // Fallback: создаем WAV файл
