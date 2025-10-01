@@ -109,7 +109,7 @@ export const AudioInput = ({
     // Используем оригинальные параметры - ваш форк должен их поддерживать
     console.log("Используем параметры:", {
       numberOfChannels,
-      sampleRate,
+      sampleRate: 48000, // Принудительно 48kHz для максимального качества
       bitrate: 320,
     });
 
@@ -121,14 +121,17 @@ export const AudioInput = ({
     for (let i = 0; i < length; i++) {
       // Левый канал
       const leftSample = buffer.getChannelData(0)[i];
-      leftChannel[i] = Math.max(-32768, Math.min(32767, leftSample * 32768));
+      leftChannel[i] = Math.max(
+        -32768,
+        Math.min(32767, Math.round(leftSample * 32767))
+      );
 
       // Правый канал (если есть, иначе дублируем левый)
       if (numberOfChannels > 1) {
         const rightSample = buffer.getChannelData(1)[i];
         rightChannel[i] = Math.max(
           -32768,
-          Math.min(32767, rightSample * 32768)
+          Math.min(32767, Math.round(rightSample * 32767))
         );
       } else {
         rightChannel[i] = leftChannel[i]; // Моно в стерео
@@ -143,14 +146,14 @@ export const AudioInput = ({
 
     // Ваш форк lamejs должен работать без дополнительной инициализации
 
-    // Создаем MP3 энкодер с улучшенными параметрами качества
+    // Создаем MP3 энкодер с максимальными параметрами качества
     console.log("Создаем MP3 энкодер...");
-    // Используем высокое качество: 320 kbps для лучшего звука
-    const mp3encoder = new lamejs.Mp3Encoder(numberOfChannels, 44100, 320); // Высокое качество
+    // Используем максимальное качество: 48kHz, 320 kbps для лучшего звука
+    const mp3encoder = new lamejs.Mp3Encoder(numberOfChannels, 48000, 320); // Максимальное качество
     console.log("MP3 энкодер создан успешно");
     console.log("Параметры энкодера:", {
       channels: numberOfChannels,
-      sampleRate: 44100,
+      sampleRate: 48000,
       bitrate: 320,
     });
     const mp3Data: Int8Array[] = [];
