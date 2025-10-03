@@ -13,7 +13,6 @@ interface ImageUploadOrPickerProps {
   onFileChange?: (file: File | null) => void;
   className?: string;
   placeholder?: string;
-  maxSize?: number; // максимальный размер в MB
   compressionOptions?: {
     quality?: number;
     maxWidth?: number;
@@ -30,7 +29,6 @@ export const ImageUploadOrPicker = ({
   onFileChange,
   className,
   placeholder = "Выберите изображение...",
-  maxSize = 10,
   compressionOptions = {
     quality: 0.85,
     maxWidth: 1920,
@@ -54,7 +52,6 @@ export const ImageUploadOrPicker = ({
         const url = URL.createObjectURL(result.file);
         onChange?.(url);
         onFileChange?.(result.file);
-
       } catch (error) {
         console.error("Ошибка сжатия изображения:", error);
         alert("Ошибка при сжатии изображения");
@@ -163,7 +160,6 @@ export const ImageUploadOrPicker = ({
               <Eye className="h-3 w-3" />
             </Button>
           </div>
-          
         </div>
       )}
 
@@ -198,7 +194,6 @@ export const ImageUploadOrPicker = ({
               <Eye className="h-3 w-3" />
             </Button>
           </div>
-          
         </div>
       )}
 
