@@ -277,7 +277,7 @@ export const CreateTrackDialogForm = ({
               {...props}
               onFileChange={handleImageFileChange}
               placeholder="Перетащите изображение или загрузите"
-              maxSize={10} // 10MB для исходного файла
+              maxSize={10} 
               compressionOptions={{
                 quality: 0.85,
                 maxWidth: 1920,

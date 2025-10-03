@@ -4,6 +4,7 @@ import { ConfirmDialog } from "@/components/ui/confirm_dialog";
 import { DateDisplay } from "@/components/ui/date_display";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PresentationOptionsDialog } from "@/components/ui/presentation_options_dialog";
+import { Separator } from "@/components/ui/separator";
 import { CreateProjectDialogForm, type Project } from "@/entities/project";
 import {
   generatePresentationHTMLWithAssets,
@@ -139,74 +140,74 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
   };
 
   return (
-    <div
-      className={cn(
-        "grid items-center mb-4",
-        showDeadline
-          ? "grid-cols-[1fr_1fr_2fr] 2xl:grid-cols-[3fr_1fr_3fr]"
-          : "grid-cols-[1fr_auto]"
-      )}
-    >
-      <h1 className="text-2xl">{project.name}</h1>
-      {showDeadline && (
-        <div className="2xl:text-center text-muted-foreground">
-          Дедлайн{" "}
-          <DateDisplay
-            date={project.deadline!}
-            mode="relative"
-            className="font-normal text-md"
-          />
-        </div>
-      )}
-      <div className="flex justify-end items-center space-x-2">
-        <Link
-          to="/"
-          className="text-sm font-medium cursor-pointer hover:underline transition-all duration-300"
-          style={{ color: "var(--primary)" }}
-        >
-          Вернуться на главную
-        </Link>
-        {/* <Button size="sm" variant="outline" disabled>
-          Предпросмотр
-        </Button> */}
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button size="sm">Редактировать</Button>
-          </DialogTrigger>
-          <DialogContent className="w-[540px] overflow-y-auto custom-scrollbar dialog-max-height">
-            <CreateProjectDialogForm
-              defaultValues={project || undefined}
-              onSuccess={() => setOpen(false)}
+    <div className="sticky top-0 bg-white z-10 py-4">
+      <div
+        className={cn(
+          "grid items-center mb-4 px-4",
+          showDeadline
+            ? "grid-cols-[1fr_1fr_2fr] 2xl:grid-cols-[3fr_1fr_3fr]"
+            : "grid-cols-[1fr_auto]"
+        )}
+      >
+        <h1 className="text-2xl">{project.name}</h1>
+        {showDeadline && (
+          <div className="2xl:text-center text-muted-foreground">
+            Дедлайн{" "}
+            <DateDisplay
+              date={project.deadline!}
+              mode="relative"
+              className="font-normal text-md"
             />
-          </DialogContent>
-        </Dialog>
-        <Button
-          size="sm"
-          disabled={!completed || isCreatingPresentation}
-          onClick={handleCreatePresentation}
-        >
-          {isCreatingPresentation ? "Создание..." : "Создать презентацию"}
-        </Button>
-
-        <ConfirmDialog
-          variant="destructive"
-          title="Удаление проекта"
-          description="Вы уверены, что хотите удалить проект? Это действие не может быть отменено."
-          confirmText="Удалить проект"
-          onConfirm={handleDelete}
-        >
-          <Button size="sm" variant="destructive">
-            Удалить
+          </div>
+        )}
+        <div className="flex justify-end items-center space-x-2">
+          <Link
+            to="/"
+            className="text-sm font-medium cursor-pointer hover:underline transition-all duration-300"
+            style={{ color: "var(--primary)" }}
+          >
+            Вернуться на главную
+          </Link>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size="sm">Редактировать</Button>
+            </DialogTrigger>
+            <DialogContent className="w-[540px] overflow-y-auto custom-scrollbar dialog-max-height">
+              <CreateProjectDialogForm
+                defaultValues={project || undefined}
+                onSuccess={() => setOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+          <Button
+            size="sm"
+            disabled={!completed || isCreatingPresentation}
+            onClick={handleCreatePresentation}
+          >
+            {isCreatingPresentation ? "Создание..." : "Создать презентацию"}
           </Button>
-        </ConfirmDialog>
-      </div>
 
-      {/* Диалог выбора формата презентации */}
-      <PresentationOptionsDialog
-        open={showPresentationOptions}
-        onOpenChange={setShowPresentationOptions}
-        onSelectOption={handleSelectPresentationOption}
-      />
+          <ConfirmDialog
+            variant="destructive"
+            title="Удаление проекта"
+            description="Вы уверены, что хотите удалить проект? Это действие не может быть отменено."
+            confirmText="Удалить проект"
+            onConfirm={handleDelete}
+          >
+            <Button size="sm" variant="destructive">
+              Удалить
+            </Button>
+          </ConfirmDialog>
+        </div>
+
+        {/* Диалог выбора формата презентации */}
+        <PresentationOptionsDialog
+          open={showPresentationOptions}
+          onOpenChange={setShowPresentationOptions}
+          onSelectOption={handleSelectPresentationOption}
+        />
+      </div>
+      <Separator className="w-full" />
     </div>
   );
 };

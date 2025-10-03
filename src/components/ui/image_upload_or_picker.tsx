@@ -55,12 +55,6 @@ export const ImageUploadOrPicker = ({
         onChange?.(url);
         onFileChange?.(result.file);
 
-        console.log("Изображение сжато:", {
-          original: `${(result.originalSize / 1024 / 1024).toFixed(2)}MB`,
-          compressed: `${(result.compressedSize / 1024 / 1024).toFixed(2)}MB`,
-          ratio: `${result.compressionRatio.toFixed(1)}%`,
-          format: result.format,
-        });
       } catch (error) {
         console.error("Ошибка сжатия изображения:", error);
         alert("Ошибка при сжатии изображения");
@@ -101,9 +95,6 @@ export const ImageUploadOrPicker = ({
             <p className="text-sm text-gray-600 mb-2">{placeholder}</p>
             <p className="text-xs text-gray-500 mb-4">
               Поддерживаются: PNG, JPG, WebP, AVIF
-            </p>
-            <p className="text-xs text-gray-500 mb-4">
-              Максимальный размер: {maxSize}MB
             </p>
             <input
               type="file"
@@ -172,12 +163,7 @@ export const ImageUploadOrPicker = ({
               <Eye className="h-3 w-3" />
             </Button>
           </div>
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <ImageIcon className="h-4 w-4" />
-              <span>Выбрано изображение</span>
-            </div>
-          </div>
+          
         </div>
       )}
 
@@ -212,12 +198,7 @@ export const ImageUploadOrPicker = ({
               <Eye className="h-3 w-3" />
             </Button>
           </div>
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <ImageIcon className="h-4 w-4" />
-              <span>Выбрано изображение из галереи</span>
-            </div>
-          </div>
+          
         </div>
       )}
 

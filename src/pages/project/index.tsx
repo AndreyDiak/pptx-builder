@@ -1,9 +1,12 @@
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import {
   ProjectNoDataDisplay,
   ProjectPendingDisplay,
 } from "@/entities/project";
+import { AudioProvider } from "@/shared/contexts/audio_context";
 import { useProject } from "@/shared/hooks/use_project";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { ProjectDetails } from "./_details";
 import { ProjectHeader } from "./_header";
@@ -11,6 +14,7 @@ import { ProjectsTracks } from "./_tracks";
 
 export const ProjectPage = () => {
   const { id } = useParams();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const {
     data: project,
     pending,
@@ -26,15 +30,42 @@ export const ProjectPage = () => {
   }
 
   return (
-    <div className="w-full h-full p-4">
-      {/* Header */}
-      <ProjectHeader project={project} onDelete={onDelete} />
-      <Separator />
-      <div className="grid grid-cols-[1fr_3fr] gap-4 py-4">
-        {/* Project Details */}
-        <ProjectDetails project={project} />
-        <ProjectsTracks />
+    <AudioProvider>
+      <div className="w-full h-full px-4 overflow-y-auto custom-scrollbar">
+        <ProjectHeader project={project} onDelete={onDelete} />
+        <div className="flex gap-4">
+          {/* Custom Sidebar with Animation */}
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              sidebarOpen
+                ? "w-[320px] md:w-[440px] opacity-100 translate-x-0"
+                : "w-0 opacity-0 -translate-x-full"
+            }`}
+          >
+            <ProjectDetails project={project} />
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 min-w-0 transition-all duration-300 ease-in-out">
+            <ProjectsTracks>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="flex items-center gap-2 transition-all duration-200 hover:scale-105"
+              >
+                <div className="transition-transform duration-200">
+                  {sidebarOpen ? (
+                    <PanelLeftClose className="h-4 w-4" />
+                  ) : (
+                    <PanelLeftOpen className="h-4 w-4" />
+                  )}
+                </div>
+              </Button>
+            </ProjectsTracks>
+          </div>
+        </div>
       </div>
-    </div>
+    </AudioProvider>
   );
 };

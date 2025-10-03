@@ -1,5 +1,8 @@
 import { deleteFileByUrl } from "@/actions/file";
-import { AudioPreview } from "@/components/ui/audio_preview";
+import {
+  AudioPreview,
+  type AudioPreviewRef,
+} from "@/components/ui/audio_preview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm_dialog";
@@ -10,8 +13,8 @@ import { Switch } from "@/components/ui/switch";
 import { useAudioDuration } from "@/shared/hooks/use_audio_duration";
 import { useTrack } from "@/shared/hooks/use_track";
 import { formatDuration } from "@/shared/utils";
-import { Edit3, Trash } from "lucide-react";
-import { useState } from "react";
+import { Edit3, RotateCcw, Trash } from "lucide-react";
+import { useRef, useState } from "react";
 import type { Track } from "../types";
 import { CreateTrackDialogForm } from "./create_dialog_form";
 
@@ -20,8 +23,18 @@ export const TrackCard = ({ track }: { track: Track }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [deleteAudio, setDeleteAudio] = useState(true);
   const [deleteImage, setDeleteImage] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const audioPreviewRef = useRef<AudioPreviewRef>(null);
 
   const { onDelete } = useTrack(track.id, true);
+
+  const handleResetTime = () => {
+    audioPreviewRef.current?.resetTime();
+  };
+
+  const handleTimeUpdate = (time: number) => {
+    setCurrentTime(time);
+  };
 
   const handleDelete = async () => {
     // Удаляем файлы (функция сама обрабатывает невалидные URL)
@@ -51,7 +64,13 @@ export const TrackCard = ({ track }: { track: Track }) => {
       </CardHeader>
       <CardContent className="space-y-3">
         {/* Audio Preview */}
-        <AudioPreview audioSrc={track.audio_src || ""} showControls={true} />
+        <AudioPreview
+          ref={audioPreviewRef}
+          audioSrc={track.audio_src || ""}
+          showControls={true}
+          audioId={`track-${track.id}`}
+          onTimeUpdate={handleTimeUpdate}
+        />
 
         {/* Duration Info */}
         {track.audio_src && (
@@ -65,6 +84,18 @@ export const TrackCard = ({ track }: { track: Track }) => {
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Reset Time Button - показываем только если время > 0 */}
+              {currentTime > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetTime}
+                  title="Воспроизвести заново"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+              )}
+
               {/* Edit Button */}
               <Dialog open={isEditing} onOpenChange={setIsEditing}>
                 <DialogTrigger asChild>

@@ -7,16 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileInput } from "@/components/ui/file_input";
 import { Form } from "@/components/ui/form";
 import { FormField } from "@/components/ui/form_field";
 import { FormSubmitButton } from "@/components/ui/form_submit_button";
+import { ImageUploadOrPicker } from "@/components/ui/image_upload_or_picker";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useFile } from "@/shared/hooks/use_file";
 import { useProject } from "@/shared/hooks/use_project";
-import { Fragment, useCallback, useEffect } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -33,8 +33,7 @@ interface FormValues
   description?: string | null;
   deadlineEnabled: boolean;
   deadline?: Date;
-  front_page_background_src: string | null | FileList;
-  // bgFile?: FileList | string | null; // Может быть FileList, URL строкой или null
+  front_page_background_src: string | null;
 }
 
 const defaultValues: FormValues = {
@@ -51,6 +50,7 @@ export const CreateProjectDialogForm = ({
   const navigate = useNavigate();
 
   const edit = !!propsDefaultValues?.id;
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const { onCreate, onUpdate } = useProject(
     edit ? propsDefaultValues.id! : 0,
@@ -74,23 +74,18 @@ export const CreateProjectDialogForm = ({
   });
   const deadlineEnabled = manager.watch("deadlineEnabled");
 
+  const handleImageFileChange = useCallback((file: File | null) => {
+    setImageFile(file);
+  }, []);
+
   const handleSubmit = useCallback(
     async ({ data }: { data: FormValues }) => {
       let backgroundSrc = propsDefaultValues?.front_page_background_src || null;
 
-      // Обрабатываем файл
-      if (
-        data.front_page_background_src === null ||
-        data.front_page_background_src === ""
-      ) {
-        backgroundSrc = null;
-      } else if (
-        data.front_page_background_src instanceof FileList &&
-        data.front_page_background_src.length > 0
-      ) {
+      // Обрабатываем файл изображения
+      if (imageFile) {
         // Новый файл - загружаем
-        const file = data.front_page_background_src[0];
-        const uploadedUrl = await uploadFile(file);
+        const uploadedUrl = await uploadFile(imageFile);
         if (uploadedUrl) {
           backgroundSrc = uploadedUrl;
         } else {
@@ -98,11 +93,14 @@ export const CreateProjectDialogForm = ({
           return;
         }
       } else if (
+        data.front_page_background_src &&
         typeof data.front_page_background_src === "string" &&
         data.front_page_background_src.startsWith("http")
       ) {
-        // URL из БД
+        // URL из галереи или БД
         backgroundSrc = data.front_page_background_src;
+      } else {
+        backgroundSrc = null;
       }
 
       const projectData: ProjectInsert = {
@@ -135,7 +133,7 @@ export const CreateProjectDialogForm = ({
         toast.error("Не удалось обновить проект");
       }
     },
-    [edit, propsDefaultValues, manager, onSuccess, uploadFile]
+    [edit, propsDefaultValues, manager, onSuccess, uploadFile, imageFile]
   );
 
   // Автоматически устанавливаем текущую дату при включении deadlineEnabled только для новых проектов
@@ -220,18 +218,21 @@ export const CreateProjectDialogForm = ({
           help="Не рекомендуется использовать изображения с весом больше 5 МБ"
         >
           {(props) => (
-            <FileInput
+            <ImageUploadOrPicker
               {...props}
-              accept="image/*"
-              maxFiles={1}
+              onFileChange={handleImageFileChange}
               placeholder="Перетащите изображение или загрузите"
-              showFileNames={true}
+              maxSize={5} // 5MB для исходного файла
+              compressionOptions={{
+                quality: 0.85,
+                maxWidth: 1920,
+                maxHeight: 1080,
+              }}
+              bucket="photos"
+              folder="backgrounds"
               existingImageUrl={
                 propsDefaultValues?.front_page_background_src || undefined
               }
-              bucket="photos"
-              folder="backgrounds"
-              defaultTab="upload"
             />
           )}
         </FormField>
@@ -250,7 +251,7 @@ export const CreateProjectDialogForm = ({
         )}
         <DialogFooter>
           <FormSubmitButton
-            className="flex-1 h-12 text-base font-semibold"
+            className="flex-1 min-h-12 text-base font-semibold"
             size="lg"
           >
             {edit ? "Обновить проект" : "Создать проект"}

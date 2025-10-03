@@ -2,6 +2,7 @@ import { DateDisplay } from "@/components/ui/date_display";
 import { PairList } from "@/components/ui/pair_list";
 import { Separator } from "@/components/ui/separator";
 import type { Project } from "@/entities/project";
+import { useSize } from "@/shared/hooks/use_size";
 import { cn } from "@/shared/utils";
 import { Fragment, type ComponentProps } from "react";
 
@@ -12,6 +13,10 @@ interface Props extends ComponentProps<"div"> {
 export const ProjectDetails = ({ project, className, ...rest }: Props) => {
   const slidesCount = project?.track_ids?.length ?? 0;
   const total = project?.size_x * project?.size_y;
+
+  const size = useSize();
+
+  const labelWidth = size === "sm" ? 200 : size === "default" ? 250 : 300;
 
   return (
     <div className={cn("", className)} {...rest}>
@@ -57,9 +62,9 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
                 ),
               ],
             ]}
-            size="lg"
+            size={size}
             alignValues="left"
-            labelWidth={300}
+            labelWidth={labelWidth}
             className="max-w-md"
           />
           <Separator />
@@ -74,8 +79,8 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
                 ["Открыть страницу с треками", project.tracks_page_open_key],
                 ["Открыть последнюю страницу", project.last_page_open_key],
               ]}
-              labelWidth={300}
-              size="lg"
+              labelWidth={labelWidth}
+              size={size}
             />
           </div>
           <Separator />
@@ -95,8 +100,8 @@ export const ProjectDetails = ({ project, className, ...rest }: Props) => {
                   ],
                 ],
               ]}
-              labelWidth={300}
-              size="lg"
+              labelWidth={labelWidth}
+              size={size}
             />
           </div>
         </div>

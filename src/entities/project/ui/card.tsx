@@ -11,6 +11,7 @@ import {
 import { DateDisplay } from "@/components/ui/date_display";
 import { PairList } from "@/components/ui/pair_list";
 import { Separator } from "@/components/ui/separator";
+import { useSize } from "@/shared/hooks/use_size";
 import { cn } from "@/shared/utils";
 import { Link } from "react-router-dom";
 import type { Project } from "../types";
@@ -20,13 +21,17 @@ export const ProjectCard = ({ project }: { project: Project }) => {
   const total = project.size_x * project.size_y;
   const progress = Math.round((slidesCount / total) * 100);
 
+  const size = useSize();
+
   return (
     <Card className="max-w-2xl">
       <CardHeader>
         <CardTitle>{project.name}</CardTitle>
-        <CardDescription>{project.description}</CardDescription>
+        <CardDescription className="text-xs sm:text-sm md:text-base line-clamp-2">
+          {project.description}
+        </CardDescription>
         <CardAction>
-          <Button variant="default">
+          <Button variant="default" size={size}>
             <Link to={`/projects/${project.id}`}>Перейти к проекту</Link>
           </Button>
         </CardAction>
@@ -51,15 +56,20 @@ export const ProjectCard = ({ project }: { project: Project }) => {
             ],
             ["Всего треков", total],
           ]}
-          size="md"
+          size={size}
         />
       </CardContent>
       <Separator />
       <CardFooter className="flex items-center justify-between">
-        <div>
+        <p className="text-xs sm:text-sm md:text-base">
           Осталось {total - slidesCount} треков из {total}
-        </div>
-        <div className={cn(progressToColorMap[Math.round(progress / 25) * 25])}>
+        </p>
+        <div
+          className={cn(
+            progressToColorMap[Math.round(progress / 25) * 25],
+            "text-xs sm:text-sm md:text-base"
+          )}
+        >
           <span>Выполнено </span>
           <span>{progress}%</span>
         </div>

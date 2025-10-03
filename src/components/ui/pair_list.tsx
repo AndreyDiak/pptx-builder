@@ -7,7 +7,7 @@ export interface PairListProps {
   keyClassName?: string;
   valueClassName?: string;
   orientation?: "horizontal" | "vertical";
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "default" | "lg";
   alignValues?: "left" | "right" | "center";
   labelWidth?: number;
   noDataPlaceholder?: string;
@@ -19,7 +19,7 @@ const sizeClasses = {
     key: "text-xs",
     value: "text-xs",
   },
-  md: {
+  default: {
     container: "gap-3",
     key: "text-sm",
     value: "text-sm",
@@ -37,12 +37,12 @@ export function PairList({
   keyClassName,
   valueClassName,
   orientation = "horizontal",
-  size = "md",
+  size = "default",
   alignValues = "left",
   labelWidth = 120,
   noDataPlaceholder = "—",
 }: PairListProps) {
-  const sizeConfig = sizeClasses[size];
+  const sizeConfig = sizeClasses[size as keyof typeof sizeClasses];
 
   if (orientation === "vertical") {
     return (

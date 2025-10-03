@@ -4,10 +4,11 @@ import type { Track } from "@/entities/slide";
 import { TrackCard } from "@/entities/slide/ui/card";
 import { CreateTrackDialogForm } from "@/entities/slide/ui/create_dialog_form";
 import { useProject } from "@/shared/hooks/use_project";
+import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import { useTracks } from "../../shared/hooks/use_tracks";
 
-export const ProjectsTracks = () => {
+export const ProjectsTracks = ({ children }: { children?: ReactNode }) => {
   const { id: projectId } = useParams();
 
   const { data: project } = useProject(Number(projectId));
@@ -61,7 +62,9 @@ export const ProjectsTracks = () => {
 
   return (
     <div>
-      <TracksHeaderLayout projectId={projectIdNumber} completed={completed} />
+      <TracksHeaderLayout projectId={projectIdNumber} completed={completed}>
+        {children}
+      </TracksHeaderLayout>
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
         {tracks.map((track: Track) => (
           <TrackCard key={track.id} track={track} />
@@ -74,13 +77,20 @@ export const ProjectsTracks = () => {
 const TracksHeaderLayout = ({
   projectId,
   completed,
+  children,
 }: {
   projectId: number;
   completed: boolean;
+  children?: ReactNode;
 }) => {
+  // const size = useSize();
+
   return (
     <div className="flex justify-between items-center mb-4">
-      <h2 className="text-xl font-medium">Треки</h2>
+      <div className="flex items-center gap-4">
+        {children}
+        <h2 className="text-xl font-medium">Треки</h2>
+      </div>
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="default" disabled={completed}>
