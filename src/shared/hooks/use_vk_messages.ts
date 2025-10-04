@@ -41,9 +41,19 @@ export function useVkMessages() {
       const randomId = Date.now() + Math.floor(Math.random() * 1000);
       console.log('VK Messages: random_id:', randomId);
 
-      const response = await fetch(
-        `/api/vk/method/messages.send?user_id=${userId}&message=${encodeURIComponent(message)}&random_id=${randomId}&access_token=${accessToken}&v=5.131`
-      );
+      const response = await fetch('/api/vk/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          message: message,
+          random_id: randomId,
+          access_token: accessToken,
+          v: '5.131'
+        })
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

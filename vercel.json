@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/vk/users.js": {
+      "maxDuration": 10
+    },
+    "api/vk/messages.js": {
+      "maxDuration": 10
+    }
+  }
+}

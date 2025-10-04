@@ -75,7 +75,7 @@ export function useVkUser(userId: number, enabled: boolean = true) {
       }
 
       const response = await fetch(
-        `/api/vk/method/users.get?user_ids=${userId}&fields=photo_200,photo_100,photo_50,screen_name,domain&access_token=${accessToken}&v=5.131`
+        `/api/vk/users?user_ids=${userId}&fields=photo_200,photo_100,photo_50,screen_name,domain&access_token=${accessToken}&v=5.131`
       );
 
       if (!response.ok) {
@@ -148,7 +148,7 @@ export function useVkUsers(userIds: number[], enabled: boolean = true) {
       console.log('VK API: Токен настроен:', accessToken ? 'Да' : 'Нет');
 
       const response = await fetch(
-        `/api/vk/method/users.get?user_ids=${sortedIds.join(
+        `/api/vk/users?user_ids=${sortedIds.join(
           ","
         )}&fields=photo_200,photo_100,photo_50,screen_name,domain&access_token=${accessToken}&v=5.131`
       );
