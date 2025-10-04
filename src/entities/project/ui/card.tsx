@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -30,11 +28,6 @@ export const ProjectCard = ({ project }: { project: Project }) => {
         <CardDescription className="text-xs sm:text-sm md:text-base line-clamp-2">
           {project.description}
         </CardDescription>
-        <CardAction>
-          <Button variant="default" size={size}>
-            <Link to={`/projects/${project.id}`}>Перейти к проекту</Link>
-          </Button>
-        </CardAction>
       </CardHeader>
       <Separator />
       <CardContent>
@@ -58,22 +51,21 @@ export const ProjectCard = ({ project }: { project: Project }) => {
           ]}
           size={size}
         />
-      </CardContent>
-      <Separator />
-      <CardFooter className="flex items-center justify-between">
-        <p className="text-xs sm:text-sm md:text-base">
-          Осталось {total - slidesCount} треков из {total}
-        </p>
-        <div
-          className={cn(
-            progressToColorMap[Math.round(progress / 25) * 25],
-            "text-xs sm:text-sm md:text-base"
-          )}
-        >
-          <span>Выполнено </span>
-          <span>{progress}%</span>
+        <div className="flex justify-between items-center pt-2">
+          <div
+            className={cn(
+              progressToColorMap[Math.round(progress / 25) * 25],
+              "text-xs sm:text-sm md:text-base"
+            )}
+          >
+            <span>Выполнено </span>
+            <span>{progress}%</span>
+          </div>
+          <Button variant="outline" size="sm">
+            <Link to={`/projects/${project.id}`}>Перейти к проекту</Link>
+          </Button>
         </div>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };
