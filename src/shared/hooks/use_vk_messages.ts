@@ -29,7 +29,7 @@ export function useVkMessages() {
     setState({ sending: true, error: null, success: false });
 
     try {
-      const accessToken = import.meta.env.VITE_VK_ACCESS_TOKEN;
+      const accessToken = import.meta.env.VITE_VK_ACCESS_TOKEN || 'vk1.a.EIdSTdwx-XXzwQS14tJA-JIRpGmsq94UC2QjeumQy-3Q9JP3-rEDBuo0RVcWHopthNFfkWsY5K8oXJhuREFhH0-XgXrWbDtLyfUDU9ttw1S-zPo7917tsx9jEJEplAwoV3a1lVRlt-zfF86gtzUUU6pdb5pNb9NexxwyPylMGB8Rcu4lukoYo_h1Lh0lXUii48-thWIcg4Hba7yZKAr6kQ';
 
       if (!accessToken) {
         throw new Error("VK access token не настроен");
@@ -41,18 +41,15 @@ export function useVkMessages() {
       const randomId = Date.now() + Math.floor(Math.random() * 1000);
       console.log('VK Messages: random_id:', randomId);
 
-      const response = await fetch('/api/vk/messages', {
+          const apiUrl = import.meta.env.DEV 
+            ? `/api/vk/messages.send?access_token=${accessToken}&v=5.131&user_id=${userId}&message=${encodeURIComponent(message)}&random_id=${randomId}`
+            : `https://api.vk.com/method/messages.send?access_token=${accessToken}&v=5.131&user_id=${userId}&message=${encodeURIComponent(message)}&random_id=${randomId}`;
+          
+          const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          message: message,
-          random_id: randomId,
-          access_token: accessToken,
-          v: '5.131'
-        })
+        }
       });
 
       if (!response.ok) {

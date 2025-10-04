@@ -27,8 +27,6 @@ export const EventTeams = ({ children, eventId }: EventTeamsProps) => {
     error: vkError,
   } = useVkUsers(userIds, !!(registrations && registrations.length > 0));
 
-  console.log({ vkUsers, vkError });
-
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Не указано";
     const date = new Date(dateString);
@@ -62,16 +60,8 @@ export const EventTeams = ({ children, eventId }: EventTeamsProps) => {
     if (vkUser) {
       return `${vkUser.first_name} ${vkUser.last_name}`;
     }
-    return fallbackName || "Имя не указано";
+    return fallbackName || `Пользователь ${userId}`;
   };
-
-  console.log({
-    registrations,
-    vkUsers,
-    vkError,
-    vkPending,
-    userIds: userIds.length > 0 ? userIds : "no user IDs",
-  });
 
   if (pending || vkPending) {
     return (

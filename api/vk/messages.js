@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Устанавливаем CORS заголовки
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -17,10 +17,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { user_id, message, random_id, access_token, v } = req.body;
+    const { access_token, v, user_id, message, random_id } = req.query;
 
     // Проверяем обязательные параметры
-    if (!user_id || !message || !access_token) {
+    if (!user_id || !message || !access_token || !random_id) {
       res.status(400).json({ error: "Missing required parameters" });
       return;
     }
@@ -29,10 +29,7 @@ export default async function handler(req, res) {
     const vkUrl = new URL("https://api.vk.com/method/messages.send");
     vkUrl.searchParams.set("user_id", user_id);
     vkUrl.searchParams.set("message", message);
-    vkUrl.searchParams.set(
-      "random_id",
-      random_id || Date.now() + Math.floor(Math.random() * 1000)
-    );
+    vkUrl.searchParams.set("random_id", random_id);
     vkUrl.searchParams.set("access_token", access_token);
     vkUrl.searchParams.set("v", v || "5.131");
 
@@ -50,4 +47,4 @@ export default async function handler(req, res) {
     console.error("VK Messages API Error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};

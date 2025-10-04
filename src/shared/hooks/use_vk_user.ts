@@ -68,15 +68,17 @@ export function useVkUser(userId: number, enabled: boolean = true) {
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const accessToken = import.meta.env.VITE_VK_ACCESS_TOKEN;
+      const accessToken = import.meta.env.VITE_VK_ACCESS_TOKEN || 'vk1.a.EIdSTdwx-XXzwQS14tJA-JIRpGmsq94UC2QjeumQy-3Q9JP3-rEDBuo0RVcWHopthNFfkWsY5K8oXJhuREFhH0-XgXrWbDtLyfUDU9ttw1S-zPo7917tsx9jEJEplAwoV3a1lVRlt-zfF86gtzUUU6pdb5pNb9NexxwyPylMGB8Rcu4lukoYo_h1Lh0lXUii48-thWIcg4Hba7yZKAr6kQ';
 
       if (!accessToken) {
         throw new Error("VK access token не настроен");
       }
 
-      const response = await fetch(
-        `/api/vk/users?user_ids=${userId}&fields=photo_200,photo_100,photo_50,screen_name,domain&access_token=${accessToken}&v=5.131`
-      );
+          const apiUrl = import.meta.env.DEV 
+            ? `/api/vk/users.get?user_ids=${userId}&fields=photo_200,photo_100,photo_50,screen_name,domain&access_token=${accessToken}&v=5.131`
+            : `https://api.vk.com/method/users.get?user_ids=${userId}&fields=photo_200,photo_100,photo_50,screen_name,domain&access_token=${accessToken}&v=5.131`;
+          
+          const response = await fetch(apiUrl);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -136,9 +138,9 @@ export function useVkUsers(userIds: number[], enabled: boolean = true) {
     }
 
     setState(prev => ({ ...prev, loading: true, error: null }));
-
+    
     try {
-      const accessToken = import.meta.env.VITE_VK_ACCESS_TOKEN;
+      const accessToken = import.meta.env.VITE_VK_ACCESS_TOKEN || 'vk1.a.EIdSTdwx-XXzwQS14tJA-JIRpGmsq94UC2QjeumQy-3Q9JP3-rEDBuo0RVcWHopthNFfkWsY5K8oXJhuREFhH0-XgXrWbDtLyfUDU9ttw1S-zPo7917tsx9jEJEplAwoV3a1lVRlt-zfF86gtzUUU6pdb5pNb9NexxwyPylMGB8Rcu4lukoYo_h1Lh0lXUii48-thWIcg4Hba7yZKAr6kQ';
 
       if (!accessToken) {
         throw new Error("VK access token не настроен");
@@ -147,11 +149,15 @@ export function useVkUsers(userIds: number[], enabled: boolean = true) {
       console.log('VK API: Запрашиваем пользователей:', sortedIds);
       console.log('VK API: Токен настроен:', accessToken ? 'Да' : 'Нет');
 
-      const response = await fetch(
-        `/api/vk/users?user_ids=${sortedIds.join(
-          ","
-        )}&fields=photo_200,photo_100,photo_50,screen_name,domain&access_token=${accessToken}&v=5.131`
-      );
+          const apiUrl = import.meta.env.DEV 
+            ? `/api/vk/users.get?user_ids=${sortedIds.join(
+                ","
+              )}&fields=photo_200,photo_100,photo_50,screen_name,domain&access_token=${accessToken}&v=5.131`
+            : `https://api.vk.com/method/users.get?user_ids=${sortedIds.join(
+                ","
+              )}&fields=photo_200,photo_100,photo_50,screen_name,domain&access_token=${accessToken}&v=5.131`;
+          
+          const response = await fetch(apiUrl);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

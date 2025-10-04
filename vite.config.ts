@@ -20,7 +20,7 @@ export default defineConfig({
       '/api/vk': {
         target: 'https://api.vk.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/vk/, ''),
+        rewrite: (path) => path.replace(/^\/api\/vk/, '/method'),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('proxy error', err);

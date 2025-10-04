@@ -82,6 +82,7 @@ server: {
 
 #### **В продакшене (Vercel):**
 - Используются API routes: `/api/vk/users` и `/api/vk/messages`
+- API routes написаны в формате CommonJS (`module.exports`)
 - API routes проксируют запросы к VK API с правильными CORS заголовками
 - Работает на Vercel без дополнительной настройки
 
