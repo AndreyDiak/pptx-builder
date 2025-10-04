@@ -1,4 +1,20 @@
+// Импортируем node-fetch для совместимости
+let fetch;
+try {
+  fetch = globalThis.fetch;
+} catch (e) {
+  // Fallback для старых версий Node.js
+  const nodeFetch = require("node-fetch");
+  fetch = nodeFetch.default || nodeFetch;
+}
+
 module.exports = async function handler(req, res) {
+  console.log("VK Messages API: Request received", {
+    method: req.method,
+    query: req.query,
+    body: req.body,
+  });
+
   // Устанавливаем CORS заголовки
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
