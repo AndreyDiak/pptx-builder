@@ -34,11 +34,13 @@ VITE_SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJz
 ### **Development (локально):**
 - Vite proxy: `/api/vk/*` → `https://api.vk.com/method/*`
 - Переменные из `.env` файла
+- Пути: `/api/vk/users.get`, `/api/vk/messages.send`
 
 ### **Production (Vercel):**
-- Прямые запросы к VK API: `https://api.vk.com/method/*`
+- Vercel API Routes: `/api/vk/users`, `/api/vk/messages`
+- API Routes проксируют к VK API: `https://api.vk.com/method/*`
 - Переменные из Vercel Environment Variables
-- Vercel API Routes для CORS (если понадобятся)
+- Автоматическое переключение через `import.meta.env.DEV`
 
 ## ⚠️ **Потенциальные проблемы:**
 

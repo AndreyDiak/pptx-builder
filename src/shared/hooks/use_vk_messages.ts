@@ -41,11 +41,12 @@ export function useVkMessages() {
       const randomId = Date.now() + Math.floor(Math.random() * 1000);
       console.log('VK Messages: random_id:', randomId);
 
-          const apiUrl = import.meta.env.DEV 
-            ? `/api/vk/messages.send?access_token=${accessToken}&v=5.131&user_id=${userId}&message=${encodeURIComponent(message)}&random_id=${randomId}`
-            : `https://api.vk.com/method/messages.send?access_token=${accessToken}&v=5.131&user_id=${userId}&message=${encodeURIComponent(message)}&random_id=${randomId}`;
+          // Определяем базовый URL для API
+          const baseUrl = import.meta.env.DEV 
+            ? '' // Локально используем Vite proxy
+            : window.location.origin; // На Vercel используем API routes
           
-          const response = await fetch(apiUrl, {
+          const response = await fetch(`${baseUrl}/api/vk/messages?access_token=${accessToken}&v=5.131&user_id=${userId}&message=${encodeURIComponent(message)}&random_id=${randomId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
