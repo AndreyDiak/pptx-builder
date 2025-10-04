@@ -23,6 +23,7 @@ export default async function handler(req, res) {
       headers: req.headers,
       fetchAvailable: typeof fetch !== "undefined",
       nodeVersion: process.version,
+      timestamp: new Date().toISOString(),
     });
     return;
   }
