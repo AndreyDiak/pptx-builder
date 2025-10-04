@@ -5,12 +5,12 @@ import { useHttp } from "./use_http";
 export function useEventRegistrations(eventId: number) {
   return useHttp<EventRegistration[]>({
     defaultValue: [],
+    disabled: !eventId,
     fetcher: () => getEventRegistrations(eventId),
     cache: {
       enabled: true,
       id: `event_registrations:${eventId}`,
       ttl: 2 * 60 * 1000, // 2 minutes
     },
-    enabled: !!eventId,
   });
 }
