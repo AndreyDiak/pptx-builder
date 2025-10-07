@@ -1,9 +1,11 @@
 import * as ImageCompression from "@/shared/imageCompression";
 import { cn } from "@/shared/utils";
-import { Eye, Image as ImageIcon, X } from "lucide-react";
+import { Eye, Image as ImageIcon, Upload, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog";
+import { SimpleImagePicker } from "./simple_image_picker";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 interface ImageUploadOrPickerProps {
   value?: string | null;
@@ -16,6 +18,8 @@ interface ImageUploadOrPickerProps {
     maxWidth?: number;
     maxHeight?: number;
   };
+  bucket?: string;
+  folder?: string;
 }
 
 export const ImageUploadOrPicker = ({
@@ -29,8 +33,12 @@ export const ImageUploadOrPicker = ({
     maxWidth: 1920,
     maxHeight: 1080,
   },
+  bucket = "photos",
+  folder = "tracks",
 }: ImageUploadOrPickerProps) => {
+  const [activeTab, setActiveTab] = useState<"upload" | "gallery">("upload");
   const [showImageViewer, setShowImageViewer] = useState(false);
+  const [showImagePicker, setShowImagePicker] = useState(false);
 
   const handleFileSelect = useCallback(
     async (file: File) => {
@@ -51,37 +59,78 @@ export const ImageUploadOrPicker = ({
     [compressionOptions, onChange, onFileChange]
   );
 
+  const handleGalleryChange = useCallback(
+    (url: string | null) => {
+      onChange?.(url);
+      // Для галереи не передаем файл, так как это уже существующее изображение
+      onFileChange?.(null);
+    },
+    [onChange, onFileChange]
+  );
 
   return (
     <div className={cn("space-y-4", className)}>
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-        <ImageIcon className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-        <p className="text-sm text-gray-600 mb-2">{placeholder}</p>
-        <p className="text-xs text-gray-500 mb-4">
-          Поддерживаются: PNG, JPG, WebP, AVIF
-        </p>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              handleFileSelect(file);
-            }
-          }}
-          className="hidden"
-          id="image-upload-input"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() =>
-            document.getElementById("image-upload-input")?.click()
-          }
-        >
-          Выбрать файл
-        </Button>
-      </div>
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as "upload" | "gallery")}
+      >
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="upload" className="flex items-center gap-2">
+            <Upload className="h-4 w-4" />
+            Загрузить новое
+          </TabsTrigger>
+          <TabsTrigger value="gallery" className="flex items-center gap-2">
+            <ImageIcon className="h-4 w-4" />
+            Из галереи
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="upload" className="mt-4">
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <ImageIcon className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-600 mb-2">{placeholder}</p>
+            <p className="text-xs text-gray-500 mb-4">
+              Поддерживаются: PNG, JPG, WebP, AVIF
+            </p>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleFileSelect(file);
+                }
+              }}
+              className="hidden"
+              id="image-upload-input"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => document.getElementById("image-upload-input")?.click()}
+            >
+              Выбрать файл
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="gallery" className="mt-4">
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <ImageIcon className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-600 mb-2">Выберите изображение из галереи</p>
+            <p className="text-xs text-gray-500 mb-4">
+              Выберите из уже загруженных изображений
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowImagePicker(true)}
+            >
+              Открыть галерею
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Показываем текущее изображение, если оно есть */}
       {value && (
@@ -116,6 +165,19 @@ export const ImageUploadOrPicker = ({
           </div>
         </div>
       )}
+
+      {/* SimpleImagePicker */}
+      <SimpleImagePicker
+        bucket={bucket}
+        folder={folder}
+        onSelect={(url) => {
+          handleGalleryChange(url);
+          setShowImagePicker(false);
+        }}
+        onClose={() => setShowImagePicker(false)}
+        open={showImagePicker}
+        defaultActive={value || undefined}
+      />
 
       {/* Модальное окно для просмотра изображения */}
       <Dialog open={showImageViewer} onOpenChange={setShowImageViewer}>
