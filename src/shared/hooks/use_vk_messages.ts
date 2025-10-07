@@ -35,11 +35,8 @@ export function useVkMessages() {
         throw new Error("VK access token не настроен");
       }
 
-      console.log('VK Messages: Отправляем сообщение пользователю', userId);
-
       // Генерируем уникальный random_id (timestamp + случайное число)
       const randomId = Date.now() + Math.floor(Math.random() * 1000);
-      console.log('VK Messages: random_id:', randomId);
 
           // Определяем базовый URL для API
           const baseUrl = import.meta.env.DEV 
@@ -63,7 +60,6 @@ export function useVkMessages() {
         throw new Error(`VK API Error: ${data.error.error_msg} (${data.error.error_code})`);
       }
 
-      console.log('VK Messages: Сообщение отправлено, ID:', data.response);
       setState({ sending: false, error: null, success: true });
       
       return { success: true, messageId: data.response };

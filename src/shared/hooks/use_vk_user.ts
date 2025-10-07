@@ -149,8 +149,6 @@ export function useVkUsers(userIds: number[], enabled: boolean = true) {
         throw new Error("VK access token не настроен");
       }
 
-      console.log('VK API: Запрашиваем пользователей:', sortedIds);
-      console.log('VK API: Токен настроен:', accessToken ? 'Да' : 'Нет');
 
           // Определяем базовый URL для API
           const baseUrl = import.meta.env.DEV 
@@ -168,14 +166,11 @@ export function useVkUsers(userIds: number[], enabled: boolean = true) {
       }
 
       const data: VkUsersResponse = await response.json();
-      console.log('VK API: Ответ от сервера:', data);
 
       if (data.response) {
-        console.log('VK API: Получены пользователи:', data.response);
         setCachedData(cacheKey, data.response);
         setState({ data: data.response, loading: false, error: null });
       } else {
-        console.log('VK API: Пустой ответ от сервера');
         setState({ data: [], loading: false, error: null });
       }
     } catch (error) {

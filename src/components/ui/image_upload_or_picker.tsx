@@ -107,7 +107,9 @@ export const ImageUploadOrPicker = ({
             <Button
               type="button"
               variant="outline"
-              onClick={() => document.getElementById("image-upload-input")?.click()}
+              onClick={() =>
+                document.getElementById("image-upload-input")?.click()
+              }
             >
               Выбрать файл
             </Button>
@@ -117,7 +119,9 @@ export const ImageUploadOrPicker = ({
         <TabsContent value="gallery" className="mt-4">
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
             <ImageIcon className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-            <p className="text-sm text-gray-600 mb-2">Выберите изображение из галереи</p>
+            <p className="text-sm text-gray-600 mb-2">
+              Выберите изображение из галереи
+            </p>
             <p className="text-xs text-gray-500 mb-4">
               Выберите из уже загруженных изображений
             </p>
