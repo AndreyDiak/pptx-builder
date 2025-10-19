@@ -1,4 +1,4 @@
-import { Header } from "./header";
+import { Header } from "./_header";
 
 interface AppLayoutProps {
   children: React.ReactNode;

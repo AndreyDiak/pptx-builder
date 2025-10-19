@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { AppLayout } from "./components/app_layout";
+import { CalendarPage } from "./pages/calendar";
 import { EventPage } from "./pages/event";
 import { EventLayout } from "./pages/event/layout";
 import { EventsPage } from "./pages/events";
@@ -40,6 +41,14 @@ function App() {
           <ProjectLayout>
             <ProjectPage />
           </ProjectLayout>
+        }
+      />
+      <Route
+        path="/calendar"
+        element={
+          <AppLayout>
+            <CalendarPage />
+          </AppLayout>
         }
       />
     </Routes>

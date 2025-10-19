@@ -7,6 +7,7 @@ export const Header = () => {
   const navItems = [
     { path: "/", label: "Проекты" },
     { path: "/events", label: "Мероприятия" },
+    { path: "/calendar", label: "Календарь" },
   ];
 
   return (

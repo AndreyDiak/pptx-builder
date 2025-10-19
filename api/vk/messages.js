@@ -9,12 +9,6 @@ try {
 }
 
 export default async function handler(req, res) {
-  console.log("VK Messages API: Request received", {
-    method: req.method,
-    query: req.query,
-    body: req.body,
-  });
-
   // Устанавливаем CORS заголовки
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -49,18 +43,13 @@ export default async function handler(req, res) {
     vkUrl.searchParams.set("access_token", access_token);
     vkUrl.searchParams.set("v", v || "5.131");
 
-    console.log("VK Messages API Request:", vkUrl.toString());
-
     // Делаем запрос к VK API
     const response = await fetch(vkUrl.toString());
     const data = await response.json();
 
-    console.log("VK Messages API Response:", data);
-
     // Возвращаем ответ
     res.status(200).json(data);
   } catch (error) {
-    console.error("VK Messages API Error:", error);
-    res.status(500).json({ error: "Internal server error"     });
+    res.status(500).json({ error: "Internal server error" });
   }
 }
