@@ -1,10 +1,11 @@
-import { Button } from "@/components/ui/base";
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  Separator,
 } from "@/components/ui/base";
 import { DateDisplay } from "@/components/ui/form";
 import { PairList } from "@/components/ui/pair_list";
