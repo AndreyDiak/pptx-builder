@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/base";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/base";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Event } from "../types";

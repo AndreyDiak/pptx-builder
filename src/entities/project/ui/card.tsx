@@ -1,14 +1,13 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/base";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { DateDisplay } from "@/components/ui/date_display";
+} from "@/components/ui/base";
+import { DateDisplay } from "@/components/ui/form";
 import { PairList } from "@/components/ui/pair_list";
-import { Separator } from "@/components/ui/separator";
 import { useSize } from "@/shared/hooks/use_size";
 import { cn } from "@/shared/utils";
 import { Link } from "react-router-dom";

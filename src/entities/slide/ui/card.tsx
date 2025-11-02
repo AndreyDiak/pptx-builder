@@ -2,14 +2,10 @@ import { deleteFileByUrl } from "@/actions/file";
 import {
   AudioPreview,
   type AudioPreviewRef,
-} from "@/components/ui/audio_preview";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ConfirmDialog } from "@/components/ui/confirm_dialog";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
+} from "@/components/ui/audio";
+import { Button, Card, CardContent, CardHeader, CardTitle, Separator, Switch } from "@/components/ui/base";
+import { ConfirmDialog, Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/form";
 import { useAudioDuration } from "@/shared/hooks/use_audio_duration";
 import { useTrack } from "@/shared/hooks/use_track";
 import { formatDuration } from "@/shared/utils";

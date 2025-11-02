@@ -1,5 +1,5 @@
-import { AudioInput } from "@/components/ui/audio_input";
-import { Button } from "@/components/ui/button";
+import { AudioInput } from "@/components/ui/audio";
+import { Button } from "@/components/ui/base";
 import {
   DialogClose,
   DialogDescription,
@@ -7,18 +7,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
-import { FormField } from "@/components/ui/form_field";
-import { FormSubmitButton } from "@/components/ui/form_submit_button";
-import { ImageUploadOrPicker } from "@/components/ui/image_upload_or_picker";
-import { Input } from "@/components/ui/input";
+import { Form, FormField, FormSubmitButton, Input } from "@/components/ui/form";
+import { ImageUploadOrPicker } from "@/components/ui/image";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/base";
 import { StorageService } from "@/services/storageService";
 import { useProject } from "@/shared/hooks/use_project";
 import { useTrack } from "@/shared/hooks/use_track";

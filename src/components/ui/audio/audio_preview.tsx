@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/base";
 import { useAudioContext } from "@/shared/contexts/audio_context";
 import { cn } from "@/shared/utils";
 import { Pause, Play, Volume2 } from "lucide-react";

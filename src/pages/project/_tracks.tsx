@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/base";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import type { Track } from "@/entities/slide";
 import { TrackCard } from "@/entities/slide/ui/card";

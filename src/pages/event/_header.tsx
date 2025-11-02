@@ -1,6 +1,5 @@
 import { NotificationSender } from "@/components/notification_sender";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Button, Separator } from "@/components/ui/base";
 import { useEvent } from "@/shared/hooks/use_event";
 import { BellRing } from "lucide-react";
 import { useState } from "react";

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/base";
 import {
   Dialog,
   DialogContent,
@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/form";
 import { useEventRegistrations } from "@/shared/hooks/use_event_registrations";
 import { useVkMessages } from "@/shared/hooks/use_vk_messages";
 import { useState } from "react";

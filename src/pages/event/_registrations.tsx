@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/base";
 import { EventRegistrationCard } from "@/entities/event_registration/ui/card";
 import { useEventRegistrations } from "@/shared/hooks/use_event_registrations";
 import { useVkUsers } from "@/shared/hooks/use_vk_user";

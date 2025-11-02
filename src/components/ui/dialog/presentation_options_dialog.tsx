@@ -1,17 +1,17 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/base";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/base";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "./dialog";
 import { Download, FileArchive, FileText, Wifi, WifiOff } from "lucide-react";
 
 interface PresentationOptionsDialogProps {

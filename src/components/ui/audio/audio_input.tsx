@@ -1,5 +1,5 @@
-import { AudioEditor } from "@/components/ui/audio_editor";
-import { Button } from "@/components/ui/button";
+import { AudioEditor } from "./audio_editor";
+import { Button } from "@/components/ui/base";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/shared/utils";
 import * as lamejs from "lamejs";

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/base";
 import { useEvent } from "@/shared/hooks/use_event";
 import { Calendar, Clock, Info, MapPin, Users } from "lucide-react";
 

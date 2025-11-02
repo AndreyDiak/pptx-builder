@@ -1,4 +1,4 @@
-import { CalendarMonth } from "@/components/ui/calendar_month";
+import { CalendarMonth } from "@/components/ui/calendar";
 import { useEvents } from "@/shared/hooks/use_events";
 import { useMemo, useState } from "react";
 

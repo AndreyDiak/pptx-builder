@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/base";
 import { type VkUser } from "@/shared/hooks/use_vk_user";
 import { Phone, User, Users } from "lucide-react";
 import { type EventRegistration } from "../types";
