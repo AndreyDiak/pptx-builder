@@ -17,6 +17,16 @@ export function updateEvent(id: number, payload: Partial<EventInsert>) {
   return supabase.from('events').update(payload).eq('id', id).select().single();
 }
 
-export function deleteEvent(id: number) {
-  return supabase.from('events').delete().eq('id', id);
+export async function deleteEvent(id: number) {
+  // Сначала удаляем все регистрации мероприятия
+  const { error: registrationsError } = await supabase
+    .from('event_registrations')
+    .delete()
+    .eq('event_id', id);
+
+  if (registrationsError) {
+    return { data: null, error: registrationsError };
+  }
+
+  return await supabase.from('events').delete().eq('id', id);
 }

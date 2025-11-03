@@ -1,3 +1,4 @@
+import { ru } from "date-fns/locale";
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -6,7 +7,7 @@ import {
 import * as React from "react";
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/base";
 import { cn } from "@/shared/utils";
 
 function Calendar({
@@ -26,6 +27,8 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      locale={ru}
+      weekStartsOn={1}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
@@ -35,7 +38,7 @@ function Calendar({
       captionLayout={captionLayout}
       formatters={{
         formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+          date.toLocaleString("ru-RU", { month: "short" }),
         ...formatters,
       }}
       classNames={{

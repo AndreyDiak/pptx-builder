@@ -1,8 +1,8 @@
+import { getFileList, getPublicUrl } from "@/actions/file";
+import { cn } from "@/shared/utils";
 import { useEffect, useState } from "react";
-import { getFileList, getPublicUrl } from "../../actions/file";
-import { cn } from "../../shared/utils";
-import { Button } from "./button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog";
+import { Button } from "../base/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../dialog/dialog";
 
 interface SimpleImagePickerProps {
   bucket: string;

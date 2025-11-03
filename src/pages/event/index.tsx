@@ -1,14 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { EventDetails } from "./_details.tsx";
 import { EventHeader } from "./_header.tsx";
-import { EventTeams } from "./_teams.tsx";
+import { EventRegistrations } from "./_registrations.tsx";
 
 export const EventPage = () => {
   const { id } = useParams();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen] = useState(true);
 
   if (!id) {
     return (
@@ -40,24 +38,12 @@ export const EventPage = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 min-w-0 transition-all duration-300 ease-in-out">
-          <EventTeams eventId={Number(id)}>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="flex items-center gap-2 transition-all duration-200 hover:scale-105"
-            >
-              <div className="transition-transform duration-200">
-                {sidebarOpen ? (
-                  <PanelLeftClose className="h-4 w-4" />
-                ) : (
-                  <PanelLeftOpen className="h-4 w-4" />
-                )}
-              </div>
-            </Button>
-          </EventTeams>
-        </div>
+        <EventRegistrations
+          eventId={Number(id)}
+          className="flex-1 min-w-0 transition-all duration-300 ease-in-out"
+        />
+        {/* <div className="flex-1 min-w-0 transition-all duration-300 ease-in-out">
+        </div> */}
       </div>
     </div>
   );

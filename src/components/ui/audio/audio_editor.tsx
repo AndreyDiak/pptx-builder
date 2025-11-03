@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/base";
+import { Input, Label } from "@/components/ui/form";
 import {
   MousePointer,
   Pause,
@@ -12,7 +11,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DialogFooter, DialogTitle } from "./dialog";
+import { DialogFooter, DialogTitle } from "@/components/ui/dialog";
 
 interface AudioEditorProps {
   audioUrl: string;

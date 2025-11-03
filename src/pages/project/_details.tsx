@@ -1,6 +1,6 @@
-import { DateDisplay } from "@/components/ui/date_display";
+import { DateDisplay } from "@/components/ui/form";
 import { PairList } from "@/components/ui/pair_list";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/components/ui/base";
 import type { Project } from "@/entities/project";
 import { useSize } from "@/shared/hooks/use_size";
 import { cn } from "@/shared/utils";

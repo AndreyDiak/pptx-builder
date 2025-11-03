@@ -2,10 +2,10 @@ import * as ImageCompression from "@/shared/imageCompression";
 import { cn } from "@/shared/utils";
 import { Eye, Image as ImageIcon, Upload, X } from "lucide-react";
 import { useCallback, useState } from "react";
-import { Button } from "./button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog";
+import { Button } from "../base/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../base/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../dialog/dialog";
 import { SimpleImagePicker } from "./simple_image_picker";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
 interface ImageUploadOrPickerProps {
   value?: string | null;

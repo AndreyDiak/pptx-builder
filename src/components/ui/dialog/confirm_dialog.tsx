@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactNode } from "react";
-import { Button } from "./button";
+import { Button } from "../base/button";
 import {
   Dialog,
   DialogClose,

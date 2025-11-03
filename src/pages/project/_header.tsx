@@ -1,10 +1,7 @@
 import { getTracks } from "@/actions/track";
-import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/confirm_dialog";
-import { DateDisplay } from "@/components/ui/date_display";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { PresentationOptionsDialog } from "@/components/ui/presentation_options_dialog";
-import { Separator } from "@/components/ui/separator";
+import { Button, Separator } from "@/components/ui/base";
+import { ConfirmDialog, Dialog, DialogContent, DialogTrigger, PresentationOptionsDialog } from "@/components/ui/dialog";
+import { DateDisplay } from "@/components/ui/form";
 import { CreateProjectDialogForm, type Project } from "@/entities/project";
 import {
   generatePresentationHTMLWithAssets,

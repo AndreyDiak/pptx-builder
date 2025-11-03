@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/ui/date_picker";
+import { Button } from "@/components/ui/base";
+import { DatePicker } from "@/components/ui/form";
 import {
   DialogClose,
   DialogDescription,
@@ -7,13 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
-import { FormField } from "@/components/ui/form_field";
-import { FormSubmitButton } from "@/components/ui/form_submit_button";
-import { ImageUploadOrPicker } from "@/components/ui/image_upload_or_picker";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
+import { Form, FormField, FormSubmitButton, Input, Textarea } from "@/components/ui/form";
+import { ImageUploadOrPicker } from "@/components/ui/image";
+import { Switch } from "@/components/ui/base";
 import { useFile } from "@/shared/hooks/use_file";
 import { useProject } from "@/shared/hooks/use_project";
 import { Fragment, useCallback, useEffect, useState } from "react";
