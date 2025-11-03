@@ -1,4 +1,10 @@
-import { Button } from "@/components/ui/base";
+import {
+  Button,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/base";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   LayoutAction,
@@ -12,15 +18,42 @@ import { EventCard } from "@/entities/event/ui/card";
 import { CreateEventDialogForm } from "@/entities/event/ui/create_dialog_form";
 import { useEvents } from "@/shared/hooks/use_events";
 import { useSize } from "@/shared/hooks/use_size";
-import { Fragment, useEffect, useState } from "react";
+import { parseAsStringEnum, useQueryState } from "nuqs";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
+type EventTypeFilter = "all" | "brain" | "audio";
 
 export const EventsPage = () => {
   const { data: events, pending, error, refresh } = useEvents();
   const size = useSize();
   const [open, setOpen] = useState(false);
+  const [eventTypeFilter, setEventTypeFilter] = useQueryState(
+    "type",
+    parseAsStringEnum<EventTypeFilter>(["all", "brain", "audio"]).withDefault(
+      "all"
+    )
+  );
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Фильтруем события по типу
+  const filteredEvents = useMemo(() => {
+    if (!events) return [];
+    const filter = eventTypeFilter || "all";
+    if (filter === "all") return events;
+    return events.filter((event) => event.event_type === filter);
+  }, [events, eventTypeFilter]);
+
+  // Подсчитываем количество событий по типам
+  const eventCounts = useMemo(() => {
+    if (!events) return { all: 0, brain: 0, audio: 0 };
+    return {
+      all: events.length,
+      brain: events.filter((e) => e.event_type === "brain").length,
+      audio: events.filter((e) => e.event_type === "audio").length,
+    };
+  }, [events]);
 
   // Обновляем список при переходе с флагом refresh
   useEffect(() => {
@@ -30,6 +63,11 @@ export const EventsPage = () => {
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state, refresh, navigate, location.pathname]);
+
+  const handleSuccess = () => {
+    refresh();
+    setOpen(false);
+  };
 
   if (pending) {
     return (
@@ -57,11 +95,6 @@ export const EventsPage = () => {
     );
   }
 
-  const handleSuccess = () => {
-    refresh();
-    setOpen(false);
-  };
-
   return (
     <Fragment>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -76,35 +109,58 @@ export const EventsPage = () => {
           </LayoutTitle>
           <LayoutAction>
             <Button size={size} onClick={() => setOpen(true)}>
-              + Создать мероприятие
+              + Создать
             </Button>
           </LayoutAction>
         </LayoutHeader>
         <LayoutBody>
-          {events && events.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
-              {events.map((event: Event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 shadow-lg">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                  Пока нет мероприятий
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Создайте первое мероприятие, чтобы начать планирование
-                </p>
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700"
-                  onClick={() => setOpen(true)}
-                >
-                  + Создать мероприятие
-                </Button>
-              </div>
-            </div>
-          )}
+          <Tabs
+            value={eventTypeFilter || "all"}
+            onValueChange={(value) =>
+              setEventTypeFilter(value as EventTypeFilter)
+            }
+            className="w-full"
+          >
+            <TabsList className="mb-6">
+              <TabsTrigger value="all">Все ({eventCounts.all})</TabsTrigger>
+              <TabsTrigger value="brain">
+                Мзг. ({eventCounts.brain})
+              </TabsTrigger>
+              <TabsTrigger value="audio">
+                КараокеЛото ({eventCounts.audio})
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value={eventTypeFilter || "all"}>
+              {filteredEvents && filteredEvents.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 items-stretch">
+                  {filteredEvents.map((event: Event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 shadow-lg">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                      {(eventTypeFilter || "all") === "all"
+                        ? "Пока нет мероприятий"
+                        : `Нет мероприятий типа "${eventTypeFilter}"`}
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      {(eventTypeFilter || "all") === "all"
+                        ? "Создайте первое мероприятие, чтобы начать планирование"
+                        : `Создайте мероприятие типа "${eventTypeFilter}", чтобы начать планирование`}
+                    </p>
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => setOpen(true)}
+                    >
+                      + Создать мероприятие
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </LayoutBody>
       </LayoutMain>
     </Fragment>

@@ -1,11 +1,13 @@
 import { format } from "date-fns";
+import { ru } from "date-fns/locale";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
 import * as React from "react";
 
 import {
-  Button, Popover,
+  Button,
+  Popover,
   PopoverContent,
-  PopoverTrigger
+  PopoverTrigger,
 } from "@/components/ui/base";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "./input";
@@ -63,11 +65,11 @@ export function DatePicker({
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
-    
+
     if (date) {
       // Устанавливаем время из состояния (часы и минуты)
       date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
-      
+
       if (!showTime) {
         // Если не показываем время, закрываем попап и сразу отправляем значение
         if (onChange) {
@@ -119,7 +121,7 @@ export function DatePicker({
         newDate.getSeconds(),
         newDate.getMilliseconds()
       );
-      
+
       if (onChange) {
         onChange(newDate);
       }
@@ -129,13 +131,8 @@ export function DatePicker({
   const handleApply = () => {
     if (selectedDate) {
       const finalDate = new Date(selectedDate);
-      finalDate.setHours(
-        parseInt(hours, 10),
-        parseInt(minutes, 10),
-        0,
-        0
-      );
-      
+      finalDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+
       if (onChange) {
         onChange(finalDate);
       }
@@ -145,11 +142,11 @@ export function DatePicker({
 
   const formatDisplayDate = (date: Date | undefined) => {
     if (!date) return null;
-    
+
     if (showTime) {
-      return `${format(date, "PPP")} ${format(date, "HH:mm")}`;
+      return `${format(date, "PPP", { locale: ru })} ${format(date, "HH:mm")}`;
     }
-    return format(date, "PPP");
+    return format(date, "PPP", { locale: ru });
   };
 
   return (
@@ -190,7 +187,10 @@ export function DatePicker({
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  <Label htmlFor="time-hours" className="text-xs text-muted-foreground mb-1 block">
+                  <Label
+                    htmlFor="time-hours"
+                    className="text-xs text-muted-foreground mb-1 block"
+                  >
                     Часы
                   </Label>
                   <Input
@@ -206,7 +206,10 @@ export function DatePicker({
                 </div>
                 <span className="text-xl font-medium pt-6">:</span>
                 <div className="flex-1">
-                  <Label htmlFor="time-minutes" className="text-xs text-muted-foreground mb-1 block">
+                  <Label
+                    htmlFor="time-minutes"
+                    className="text-xs text-muted-foreground mb-1 block"
+                  >
                     Минуты
                   </Label>
                   <Input
@@ -222,11 +225,7 @@ export function DatePicker({
                 </div>
               </div>
               {selectedDate && (
-                <Button
-                  onClick={handleApply}
-                  className="w-full mt-2"
-                  size="sm"
-                >
+                <Button onClick={handleApply} className="w-full mt-2" size="sm">
                   Применить
                 </Button>
               )}

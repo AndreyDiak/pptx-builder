@@ -1,4 +1,11 @@
-import { Button } from "@/components/ui/base";
+import {
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/base";
 import {
   DialogClose,
   DialogDescription,
@@ -6,7 +13,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DatePicker, Form, FormField, FormSubmitButton, Input, Textarea } from "@/components/ui/form";
+import {
+  DatePicker,
+  Form,
+  FormField,
+  FormSubmitButton,
+  Input,
+  Textarea,
+} from "@/components/ui/form";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -23,6 +37,7 @@ interface FormValues extends Omit<EventInsert, "event_date"> {
   location?: string | null;
   max_teams?: number | null;
   is_active?: boolean | null;
+  event_type?: "brain" | "audio" | null;
   event_date: Date;
 }
 
@@ -32,6 +47,7 @@ const defaultValues: FormValues = {
   location: "",
   max_teams: null,
   is_active: true,
+  event_type: null,
   event_date: new Date(),
 };
 
@@ -49,6 +65,7 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
           location: data.location || null,
           max_teams: data.max_teams || null,
           is_active: data.is_active,
+          event_type: data.event_type || null,
           event_date: data.event_date.toISOString(),
         };
 
@@ -101,6 +118,20 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
           />
         </FormField>
 
+        <FormField name="event_type" label="Тип мероприятия" useController>
+          {({ value, onChange }) => (
+            <Select value={value || undefined} onValueChange={onChange}>
+              <SelectTrigger className="w-full h-12">
+                <SelectValue placeholder="Выберите тип мероприятия" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="brain">Мзг.</SelectItem>
+                <SelectItem value="audio">КараокеЛото</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        </FormField>
+
         <FormField
           name="event_date"
           label="Дата и время мероприятия"
@@ -119,10 +150,7 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
           />
         </FormField>
 
-        <FormField
-          name="max_teams"
-          label="Максимальное количество команд"
-        >
+        <FormField name="max_teams" label="Максимальное количество команд">
           <Input
             type="number"
             placeholder="Введите количество команд"

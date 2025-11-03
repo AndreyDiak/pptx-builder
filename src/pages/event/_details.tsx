@@ -1,6 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/base";
+import { DateDisplay } from "@/components/ui/form";
+import { PairList } from "@/components/ui/pair_list";
 import { useEvent } from "@/shared/hooks/use_event";
-import { Calendar, Clock, Info, MapPin, Users } from "lucide-react";
+import { useEventRegistrations } from "@/shared/hooks/use_event_registrations";
+import { useSize } from "@/shared/hooks/use_size";
+import { cn } from "@/shared/utils";
 
 interface EventDetailsProps {
   eventId: number;
@@ -8,6 +11,10 @@ interface EventDetailsProps {
 
 export const EventDetails = ({ eventId }: EventDetailsProps) => {
   const { data: event, pending } = useEvent(eventId);
+  const { data: registrations } = useEventRegistrations(eventId);
+  const size = useSize();
+
+  const labelWidth = size === "sm" ? 200 : size === "default" ? 250 : 300;
 
   if (pending) {
     return (
@@ -24,104 +31,61 @@ export const EventDetails = ({ eventId }: EventDetailsProps) => {
   if (!event) {
     return (
       <div className="p-4">
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-gray-600">Мероприятие не найдено</p>
-          </CardContent>
-        </Card>
+        <p className="text-gray-600">Мероприятие не найдено</p>
       </div>
     );
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("ru-RU", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString("ru-RU", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const isUpcoming = new Date(event.event_date) > new Date();
 
   return (
-    <div className="p-4 space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5 text-blue-600" />
-            Информация о мероприятии
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-3">
-            <Calendar className="h-4 w-4 text-gray-500" />
-            <div>
-              <p className="font-medium">{formatDate(event.event_date)}</p>
-              <p className="text-sm text-gray-600">
-                {formatTime(event.event_date)}
-              </p>
-            </div>
+    <div className={cn("", "p-4")}>
+      <h2 className="text-xl font-medium">Информация о мероприятии</h2>
+      <div className="mt-6">
+        {event.description && (
+          <div className="text-muted-foreground text-sm mb-4">
+            {event.description}
           </div>
-
-          {event.location && (
-            <div className="flex items-center gap-3">
-              <MapPin className="h-4 w-4 text-gray-500" />
-              <div>
-                <p className="font-medium">Место проведения</p>
-                <p className="text-sm text-gray-600">{event.location}</p>
-              </div>
-            </div>
-          )}
-
-          {event.max_teams && (
-            <div className="flex items-center gap-3">
-              <Users className="h-4 w-4 text-gray-500" />
-              <div>
-                <p className="font-medium">Максимум команд</p>
-                <p className="text-sm text-gray-600">
-                  {event.max_teams}
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center gap-3">
-            <Clock className="h-4 w-4 text-gray-500" />
-            <div>
-              <p className="font-medium">Статус</p>
-              <span
-                className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                  isUpcoming
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {isUpcoming ? "Предстоящее" : "Завершено"}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {event.description && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Описание</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-700 leading-relaxed">{event.description}</p>
-          </CardContent>
-        </Card>
-      )}
+        )}
+        <div className="flex flex-col gap-4">
+          <PairList
+            pairs={[
+              [
+                "Дата и время",
+                <DateDisplay
+                  date={event.event_date}
+                  mode="absolute"
+                  showTime={true}
+                />,
+              ],
+              ["Место проведения", event.location || null],
+              [
+                "Зарегистрировано команд",
+                `${registrations?.length || 0}${
+                  event.max_teams ? ` / ${event.max_teams}` : ""
+                }`,
+              ],
+              [
+                "Статус",
+                <span
+                  className={cn(
+                    "inline-block px-2 py-1 rounded-full text-xs font-medium",
+                    isUpcoming
+                      ? "bg-green-100 text-green-800"
+                      : "bg-gray-100 text-gray-800"
+                  )}
+                >
+                  {isUpcoming ? "Предстоящее" : "Завершено"}
+                </span>,
+              ],
+            ]}
+            size={size}
+            alignValues="left"
+            labelWidth={labelWidth}
+            className="max-w-md"
+          />
+        </div>
+      </div>
     </div>
   );
 };

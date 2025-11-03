@@ -18,7 +18,7 @@ export const Header = () => {
           <div className="flex items-center gap-8">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-black drop-shadow-lg">
-                КараокеЛото
+                Планер
               </h1>
             </div>
             <nav className="hidden md:flex items-end gap-1">

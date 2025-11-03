@@ -1,4 +1,10 @@
-import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/base";
+import {
+  Button,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/base";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   LayoutAction,
@@ -51,31 +57,32 @@ export const ProjectsPage = () => {
           <CreateProjectDialogForm onSuccess={() => setOpen(false)} />
         </DialogContent>
       </Dialog>
-      <LayoutMain className="relative">
-        <Tabs defaultValue="all" className="w-full">
-          <LayoutHeader>
-            <LayoutTitle>
-              <TabsList>
-                <TabsTrigger value="all">Все</TabsTrigger>
-                <TabsTrigger value="editing">В процессе</TabsTrigger>
-                <TabsTrigger value="completed">Готовые</TabsTrigger>
-              </TabsList>
-            </LayoutTitle>
-            <LayoutAction>
-              <Button size={size} onClick={() => setOpen(true)}>
-                + Создать проект
-              </Button>
-            </LayoutAction>
-          </LayoutHeader>
-          <LayoutBody>
-            <TabsContent value="all" className="mt-2 sm:mt-4 md:mt-6">
+      <LayoutMain>
+        <LayoutHeader>
+          <LayoutTitle>
+            <h2 className="text-2xl font-bold text-gray-800">Проекты</h2>
+          </LayoutTitle>
+          <LayoutAction>
+            <Button size={size} onClick={() => setOpen(true)}>
+              + Создать
+            </Button>
+          </LayoutAction>
+        </LayoutHeader>
+        <LayoutBody>
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="mb-6">
+              <TabsTrigger value="all">Все</TabsTrigger>
+              <TabsTrigger value="editing">В процессе</TabsTrigger>
+              <TabsTrigger value="completed">Готовые</TabsTrigger>
+            </TabsList>
+            <TabsContent value="all">
               <div className="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2 sm:gap-4 md:gap-6">
                 {projects?.map((project) => (
                   <ProjectCard key={project.id} project={project} />
                 ))}
               </div>
             </TabsContent>
-            <TabsContent value="editing" className="mt-2 sm:mt-4 md:mt-6">
+            <TabsContent value="editing">
               <div className="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2 sm:gap-4 md:gap-6">
                 {projects
                   ?.filter((project) => project.status === "editing")
@@ -84,7 +91,7 @@ export const ProjectsPage = () => {
                   ))}
               </div>
             </TabsContent>
-            <TabsContent value="completed" className="mt-2 sm:mt-4 md:mt-6">
+            <TabsContent value="completed">
               <div className="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2 sm:gap-4 md:gap-6">
                 {projects
                   ?.filter((project) => project.status === "completed")
@@ -93,8 +100,8 @@ export const ProjectsPage = () => {
                   ))}
               </div>
             </TabsContent>
-          </LayoutBody>
-        </Tabs>
+          </Tabs>
+        </LayoutBody>
       </LayoutMain>
     </Fragment>
   );
