@@ -6,7 +6,7 @@ import { EventRegistrations } from "./_registrations.tsx";
 
 export const EventPage = () => {
   const { id } = useParams();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen] = useState(true);
 
   if (!id) {
     return (
@@ -38,7 +38,10 @@ export const EventPage = () => {
         </div>
 
         {/* Main Content */}
-          <EventRegistrations eventId={Number(id)} className="flex-1 min-w-0 transition-all duration-300 ease-in-out" />
+        <EventRegistrations
+          eventId={Number(id)}
+          className="flex-1 min-w-0 transition-all duration-300 ease-in-out"
+        />
         {/* <div className="flex-1 min-w-0 transition-all duration-300 ease-in-out">
         </div> */}
       </div>
