@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/base";
-import { DatePicker } from "@/components/ui/form";
 import {
   DialogClose,
   DialogDescription,
@@ -7,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form, FormField, FormSubmitButton, Input, Textarea } from "@/components/ui/form";
+import { DatePicker, Form, FormField, FormSubmitButton, Input, Textarea } from "@/components/ui/form";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -22,7 +21,7 @@ interface FormValues extends Omit<EventInsert, "event_date"> {
   name: string;
   description?: string | null;
   location?: string | null;
-  max_participants?: number | null;
+  max_teams?: number | null;
   is_active?: boolean | null;
   event_date: Date;
 }
@@ -31,7 +30,7 @@ const defaultValues: FormValues = {
   name: "",
   description: "",
   location: "",
-  max_participants: null,
+  max_teams: null,
   is_active: true,
   event_date: new Date(),
 };
@@ -48,7 +47,7 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
           name: data.name,
           description: data.description || null,
           location: data.location || null,
-          max_participants: data.max_participants || null,
+          max_teams: data.max_teams || null,
           is_active: data.is_active,
           event_date: data.event_date.toISOString(),
         };
@@ -109,10 +108,10 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
           errorMessage="Дата и время обязательны"
           useController
         >
-          <DatePicker />
+          <DatePicker showTime />
         </FormField>
 
-        <FormField name="location" label="Место проведения">
+        <FormField name="location" label="Локация">
           <Input
             type="text"
             placeholder="Введите место проведения"
@@ -121,12 +120,12 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
         </FormField>
 
         <FormField
-          name="max_participants"
-          label="Максимальное количество участников"
+          name="max_teams"
+          label="Максимальное количество команд"
         >
           <Input
             type="number"
-            placeholder="Введите количество участников"
+            placeholder="Введите количество команд"
             className="h-12 text-base"
           />
         </FormField>

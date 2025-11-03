@@ -82,13 +82,13 @@ export const EventDetails = ({ eventId }: EventDetailsProps) => {
             </div>
           )}
 
-          {event.max_participants && (
+          {event.max_teams && (
             <div className="flex items-center gap-3">
               <Users className="h-4 w-4 text-gray-500" />
               <div>
-                <p className="font-medium">Максимум участников</p>
+                <p className="font-medium">Максимум команд</p>
                 <p className="text-sm text-gray-600">
-                  {event.max_participants}
+                  {event.max_teams}
                 </p>
               </div>
             </div>

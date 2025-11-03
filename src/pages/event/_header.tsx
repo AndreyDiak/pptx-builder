@@ -1,9 +1,12 @@
+import { deleteEvent } from "@/actions/event";
 import { NotificationSender } from "@/components/notification_sender";
 import { Button, Separator } from "@/components/ui/base";
+import { ConfirmDialog } from "@/components/ui/dialog";
 import { useEvent } from "@/shared/hooks/use_event";
-import { BellRing } from "lucide-react";
+import { BellRing, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface EventHeaderProps {
   eventId: number;
@@ -12,6 +15,24 @@ interface EventHeaderProps {
 export const EventHeader = ({ eventId }: EventHeaderProps) => {
   const { data: event, pending } = useEvent(eventId);
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    try {
+      const result = await deleteEvent(eventId);
+      
+      if (result.error) {
+        toast.error(`Ошибка удаления мероприятия: ${result.error.message}`);
+        return;
+      }
+
+      toast.success("Мероприятие успешно удалено");
+      navigate("/events", { state: { refresh: true } });
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      toast.error("Не удалось удалить мероприятие");
+    }
+  };
 
   if (pending) {
     return (
@@ -57,6 +78,21 @@ export const EventHeader = ({ eventId }: EventHeaderProps) => {
               <BellRing className="h-4 w-4" />
               Отправить уведомление
             </Button>
+            <ConfirmDialog
+              variant="destructive"
+              title="Удаление мероприятия"
+              description="Вы уверены, что хотите удалить мероприятие? Все связанные регистрации также будут удалены. Это действие не может быть отменено."
+              confirmText="Удалить мероприятие"
+              onConfirm={handleDelete}
+            >
+              <Button
+                variant="destructive"
+                className="flex items-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Удалить
+              </Button>
+            </ConfirmDialog>
           </div>
         </div>
         <Separator className="w-full" />

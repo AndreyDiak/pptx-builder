@@ -1,10 +1,9 @@
-import { Button } from "@/components/ui/base";
 import {
-  Card,
+  Button, Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/base";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -57,10 +56,10 @@ export const EventCard = ({ event }: EventCardProps) => {
               {event.location}
             </div>
           )}
-          {event.max_participants && (
+          {event.max_teams && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Users className="h-4 w-4" />
-              Максимум {event.max_participants} участников
+              Максимум {event.max_teams} команд
             </div>
           )}
           <div className="flex justify-between items-center pt-2">

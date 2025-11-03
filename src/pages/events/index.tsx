@@ -12,12 +12,24 @@ import { EventCard } from "@/entities/event/ui/card";
 import { CreateEventDialogForm } from "@/entities/event/ui/create_dialog_form";
 import { useEvents } from "@/shared/hooks/use_events";
 import { useSize } from "@/shared/hooks/use_size";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const EventsPage = () => {
-  const { data: events, pending, error } = useEvents();
+  const { data: events, pending, error, refresh } = useEvents();
   const size = useSize();
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Обновляем список при переходе с флагом refresh
+  useEffect(() => {
+    if (location.state?.refresh) {
+      refresh();
+      // Очищаем state, чтобы не обновлять при каждом рендере
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, refresh, navigate, location.pathname]);
 
   if (pending) {
     return (
@@ -45,11 +57,16 @@ export const EventsPage = () => {
     );
   }
 
+  const handleSuccess = () => {
+    refresh();
+    setOpen(false);
+  };
+
   return (
     <Fragment>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="overflow-y-auto custom-scrollbar dialog-max-height">
-          <CreateEventDialogForm onSuccess={() => setOpen(false)} />
+          <CreateEventDialogForm onSuccess={handleSuccess} />
         </DialogContent>
       </Dialog>
       <LayoutMain>
