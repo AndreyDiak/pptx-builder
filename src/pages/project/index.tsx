@@ -31,9 +31,9 @@ export const ProjectPage = () => {
 
   return (
     <AudioProvider>
-      <div className="w-full h-full px-4 overflow-y-auto custom-scrollbar">
+      <div className="w-full h-full px-2 md:px-4 overflow-y-auto custom-scrollbar">
         <ProjectHeader project={project} onDelete={onDelete} />
-        <div className="flex gap-4">
+        <div className="flex gap-2 md:gap-4">
           {/* Custom Sidebar with Animation */}
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${

@@ -1,3 +1,5 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/base";
+import { Info, Users } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { EventDetails } from "./_details.tsx";
@@ -10,7 +12,7 @@ export const EventPage = () => {
 
   if (!id) {
     return (
-      <div className="w-full h-full px-4 overflow-y-auto custom-scrollbar">
+      <div className="w-full h-full px-2 md:px-4 overflow-y-auto custom-scrollbar">
         <div className="text-center py-12">
           <h2 className="text-lg font-semibold text-gray-800 mb-2">
             Мероприятие не найдено
@@ -22,10 +24,33 @@ export const EventPage = () => {
   }
 
   return (
-    <div className="w-full h-full px-4 overflow-y-auto custom-scrollbar">
+    <div className="w-full h-full overflow-y-auto custom-scrollbar">
       <EventHeader eventId={Number(id)} />
 
-      <div className="flex gap-4">
+      {/* Mobile: Tabs for switching between Details and Registrations */}
+      <div className="md:hidden px-2">
+        <Tabs defaultValue="registrations" className="w-full">
+          <TabsList className="w-full mb-2">
+            <TabsTrigger value="registrations" className="flex-1">
+              <Users className="h-4 w-4 mr-2" />
+              Регистрации
+            </TabsTrigger>
+            <TabsTrigger value="details" className="flex-1">
+              <Info className="h-4 w-4 mr-2" />
+              Детали
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="registrations" className="mt-0">
+            <EventRegistrations eventId={Number(id)} />
+          </TabsContent>
+          <TabsContent value="details" className="mt-0">
+            <EventDetails eventId={Number(id)} isMobileTab={true} />
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Desktop: Sidebar with Details and Main Content with Registrations */}
+      <div className="hidden md:flex gap-2 md:gap-4 px-2 md:px-4">
         {/* Custom Sidebar with Animation */}
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
@@ -42,8 +67,6 @@ export const EventPage = () => {
           eventId={Number(id)}
           className="flex-1 min-w-0 transition-all duration-300 ease-in-out"
         />
-        {/* <div className="flex-1 min-w-0 transition-all duration-300 ease-in-out">
-        </div> */}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/base";
 import { useEventRegistrations } from "@/shared/hooks/use_event_registrations";
-import { Calendar, Clock, MapPin, Users } from "lucide-react";
+import { Calendar, Clock, CreditCard, MapPin, Mic, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Event } from "../types";
 
@@ -25,6 +25,7 @@ export const EventCard = ({ event }: EventCardProps) => {
       year: "numeric",
       month: "long",
       day: "numeric",
+      timeZone: "Europe/Moscow",
     });
   };
 
@@ -33,6 +34,7 @@ export const EventCard = ({ event }: EventCardProps) => {
     return date.toLocaleTimeString("ru-RU", {
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "Europe/Moscow",
     });
   };
 
@@ -51,21 +53,37 @@ export const EventCard = ({ event }: EventCardProps) => {
       </CardHeader>
       <CardContent className="mt-auto">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Clock className="h-4 w-4" />
-            {formatDate(event.event_date)} в {formatTime(event.event_date)}
-          </div>
           {event.location && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <MapPin className="h-4 w-4" />
-              {event.location}
+              <span className="font-medium">{event.location}</span>
+            </div>
+          )}
+          {event.host && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Mic className="h-4 w-4" />
+              Ведущий: <span className="font-medium">{event.host}</span>
             </div>
           )}
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Users className="h-4 w-4" />
-            Зарегистрировано: {registrations?.length || 0}
-            {event.max_teams ? ` / ${event.max_teams}` : ""} команд
+            <Clock className="h-4 w-4" />
+            {formatDate(event.event_date)} в{" "}
+            <span className="font-medium">{formatTime(event.event_date)}</span>
           </div>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Users className="h-4 w-4" />
+            Команды: {registrations?.length || 0}
+            {event.max_teams ? ` / ${event.max_teams}` : ""}
+          </div>
+          {event.price !== null && event.price !== undefined && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <CreditCard className="h-4 w-4" />
+              Стоимость:{" "}
+              <span className="font-medium">
+                {event.price.toLocaleString("ru-RU")} ₽
+              </span>
+            </div>
+          )}
         </div>
       </CardContent>
       <CardFooter>

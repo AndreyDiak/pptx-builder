@@ -1,25 +1,30 @@
+import logoImage from "@/assets/logo.jpg";
 import { cn } from "@/shared/utils";
-import { Calendar, CalendarDays, FolderKanban } from "lucide-react";
+import { Calendar, CalendarDays } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export const Header = () => {
   const location = useLocation();
 
   const navItems = [
-    { path: "/", label: "Проекты", icon: FolderKanban },
     { path: "/events", label: "Мероприятия", icon: Calendar },
+    // { path: "/projects", label: "Проекты", icon: FolderKanban },
     { path: "/calendar", label: "Календарь", icon: CalendarDays },
   ];
 
   return (
-    <header className="w-full bg-white/10 backdrop-blur-sm border-b border-gray-400/40 sticky top-0 z-50 px-8">
+    <header className="w-full bg-white/10 backdrop-blur-sm border-b border-gray-400/40 sticky top-0 z-50 px-4 md:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto py-4">
         <div className="flex justify-between md:justify-start items-center gap-8">
           <div className="flex items-center gap-8">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-black drop-shadow-lg">
-                Планер
-              </h1>
+              <Link to="/" className="block">
+                <img
+                  src={logoImage}
+                  alt="Планер"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
+                />
+              </Link>
             </div>
             <nav className="hidden md:flex items-end gap-1">
               {navItems.map((item) => {

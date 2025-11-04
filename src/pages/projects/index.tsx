@@ -70,7 +70,7 @@ export const ProjectsPage = () => {
         </LayoutHeader>
         <LayoutBody>
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="mb-6">
+            <TabsList className="mb-4 md:mb-6">
               <TabsTrigger value="all">Все</TabsTrigger>
               <TabsTrigger value="editing">В процессе</TabsTrigger>
               <TabsTrigger value="completed">Готовые</TabsTrigger>

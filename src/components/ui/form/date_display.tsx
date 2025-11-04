@@ -38,6 +38,7 @@ export const DateDisplay = ({
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      timeZone: 'Europe/Moscow',
     };
 
     if (showTime) {
@@ -87,7 +88,8 @@ export const DateDisplay = ({
     }
     return `${fullDate} в ${dateObj.toLocaleTimeString(locale, { 
       hour: '2-digit', 
-      minute: '2-digit' 
+      minute: '2-digit',
+      timeZone: 'Europe/Moscow'
     })}`;
   };
 

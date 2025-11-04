@@ -1,6 +1,12 @@
 import { getTracks } from "@/actions/track";
 import { Button, Separator } from "@/components/ui/base";
-import { ConfirmDialog, Dialog, DialogContent, DialogTrigger, PresentationOptionsDialog } from "@/components/ui/dialog";
+import {
+  ConfirmDialog,
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  PresentationOptionsDialog,
+} from "@/components/ui/dialog";
 import { DateDisplay } from "@/components/ui/form";
 import { CreateProjectDialogForm, type Project } from "@/entities/project";
 import {
@@ -137,10 +143,10 @@ export const ProjectHeader = ({ project, onDelete }: Props) => {
   };
 
   return (
-    <div className="sticky top-0 bg-white z-10 py-4">
+    <div className="sticky top-0 bg-white z-10 py-2 md:py-4">
       <div
         className={cn(
-          "grid items-center mb-4 px-4",
+          "grid items-center mb-4 px-2 md:px-4",
           showDeadline
             ? "grid-cols-[1fr_1fr_2fr] 2xl:grid-cols-[3fr_1fr_3fr]"
             : "grid-cols-[1fr_auto]"

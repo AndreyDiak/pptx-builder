@@ -5,9 +5,11 @@ interface LayoutMainProps extends React.ComponentProps<"div"> {}
 
 export function LayoutMain({ className, children, ...props }: LayoutMainProps) {
   return (
-    <div className={cn("w-full p-8 flex justify-center", className)} {...props}>
+    <div
+      className={cn("w-full p-4 md:p-6 lg:p-8 flex justify-center", className)}
+      {...props}
+    >
       <div className="mx-auto w-7xl">{children}</div>
     </div>
   );
 }
-

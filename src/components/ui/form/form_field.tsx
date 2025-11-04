@@ -1,12 +1,12 @@
 import { cn } from "@/shared/utils";
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { cloneElement, isValidElement } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Label } from "./label";
 
 interface FormFieldProps {
   name: string;
-  label?: string;
+  label?: string | ReactNode;
   required?: boolean;
   className?: string;
   children: ReactElement | ((props: any) => ReactElement);
@@ -34,6 +34,14 @@ export const FormField = ({
   const error = errors[name];
   const hasError = !!error;
 
+  // Получаем текст label для сообщений об ошибках
+  const getLabelText = () => {
+    if (typeof label === "string") {
+      return label;
+    }
+    return name;
+  };
+
   // Если useController = true, используем Controller
   if (useController) {
     return (
@@ -49,7 +57,7 @@ export const FormField = ({
           control={control}
           rules={{
             required: required
-              ? errorMessage || `${label || name} обязательно`
+              ? errorMessage || `${getLabelText()} обязательно`
               : false,
           }}
           render={({ field }) => {
@@ -104,7 +112,9 @@ export const FormField = ({
 
   // Обычный режим с register
   const registration = register(name, {
-    required: required ? errorMessage || `${label || name} обязательно` : false,
+    required: required
+      ? errorMessage || `${getLabelText()} обязательно`
+      : false,
   });
 
   if (!registration) {

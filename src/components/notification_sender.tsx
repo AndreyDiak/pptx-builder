@@ -72,7 +72,7 @@ export const NotificationSender = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-[90%] md:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Отправить уведомление участникам</DialogTitle>
           <DialogDescription>

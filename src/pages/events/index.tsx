@@ -37,17 +37,40 @@ export const EventsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Фильтруем события по типу
   const filteredEvents = useMemo(() => {
-    if (!events) return [];
+    if (!events) {
+      return [];
+    }
     const filter = eventTypeFilter || "all";
-    if (filter === "all") return events;
-    return events.filter((event) => event.event_type === filter);
+    let filtered = events;
+
+    if (filter !== "all") {
+      filtered = events.filter((event) => event.event_type === filter);
+    }
+
+    const now = new Date();
+    const upcoming = filtered.filter(
+      (event) => new Date(event.event_date) > now
+    );
+    const past = filtered.filter((event) => new Date(event.event_date) <= now);
+
+    upcoming.sort(
+      (a, b) =>
+        new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
+    );
+
+    past.sort(
+      (a, b) =>
+        new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
+    );
+
+    return [...upcoming, ...past];
   }, [events, eventTypeFilter]);
 
-  // Подсчитываем количество событий по типам
   const eventCounts = useMemo(() => {
-    if (!events) return { all: 0, brain: 0, audio: 0 };
+    if (!events) {
+      return { all: 0, brain: 0, audio: 0 };
+    }
     return {
       all: events.length,
       brain: events.filter((e) => e.event_type === "brain").length,
@@ -55,7 +78,6 @@ export const EventsPage = () => {
     };
   }, [events]);
 
-  // Обновляем список при переходе с флагом refresh
   useEffect(() => {
     if (location.state?.refresh) {
       refresh();
@@ -121,7 +143,7 @@ export const EventsPage = () => {
             }
             className="w-full"
           >
-            <TabsList className="mb-6">
+            <TabsList className="mb-4 md:mb-6">
               <TabsTrigger value="all">Все ({eventCounts.all})</TabsTrigger>
               <TabsTrigger value="brain">
                 Мзг. ({eventCounts.brain})
