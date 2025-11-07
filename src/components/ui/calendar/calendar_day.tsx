@@ -1,7 +1,7 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/base";
 import type { Event } from "@/entities/event/types";
 import { cn } from "@/shared/utils";
-import { Clock, MapPin, Mic, Plus } from "lucide-react";
+import { Clock, Mic, Plus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 

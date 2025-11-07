@@ -111,16 +111,16 @@ export const EventsPage = () => {
     return relevanceFiltered;
   }, [events, eventTypeFilter, cityFilter, relevanceFilter]);
 
-  const eventCounts = useMemo(() => {
-    if (!events) {
-      return { all: 0, brain: 0, audio: 0 };
-    }
-    return {
-      all: events.length,
-      brain: events.filter((e) => e.event_type === "brain").length,
-      audio: events.filter((e) => e.event_type === "audio").length,
-    };
-  }, [events]);
+  // const eventCounts = useMemo(() => {
+  //   if (!events) {
+  //     return { all: 0, brain: 0, audio: 0 };
+  //   }
+  //   return {
+  //     all: events.length,
+  //     brain: events.filter((e) => e.event_type === "brain").length,
+  //     audio: events.filter((e) => e.event_type === "audio").length,
+  //   };
+  // }, [events]);
 
   useEffect(() => {
     if (location.state?.refresh) {
