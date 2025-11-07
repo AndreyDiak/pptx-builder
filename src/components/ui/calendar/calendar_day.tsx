@@ -58,7 +58,7 @@ export const CalendarDay = ({
   const dayContent = (
     <div
       className={cn(
-        "relative w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border-2",
+        "relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border-2",
         getEventColorClasses(),
         {
           // Стили для сегодняшнего дня
@@ -73,9 +73,9 @@ export const CalendarDay = ({
       onClick={handleClick}
     >
       {isHovered && isCurrentMonth && eventsCount === 0 ? (
-        <Plus className="w-5 h-5 text-blue-600" />
+        <Plus className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
       ) : (
-        <span className="text-sm font-medium">{day}</span>
+        <span className="text-xs md:text-sm font-medium">{day}</span>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { AppLayout } from "./layouts/app";
+import { AdminPage } from "./pages/admin";
 import { CalendarPage } from "./pages/calendar";
 import { EventPage } from "./pages/event";
 import { EventLayout } from "./pages/event/layout";
@@ -56,6 +57,14 @@ function App() {
         element={
           <AppLayout>
             <CalendarPage />
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <AppLayout>
+            <AdminPage />
           </AppLayout>
         }
       />

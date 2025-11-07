@@ -1,7 +1,7 @@
 import logoImage from "@/assets/logo.jpg";
 import { ThemeToggle } from "@/components/ui/base/theme_toggle";
 import { cn } from "@/shared/utils";
-import { Calendar, CalendarDays } from "lucide-react";
+import { Calendar, CalendarDays, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export const Header = () => {
@@ -11,6 +11,7 @@ export const Header = () => {
     { path: "/events", label: "Мероприятия", icon: Calendar },
     // { path: "/projects", label: "Проекты", icon: FolderKanban },
     { path: "/calendar", label: "Календарь", icon: CalendarDays },
+    { path: "/admin", label: "Администрирование", icon: Settings },
   ];
 
   return (

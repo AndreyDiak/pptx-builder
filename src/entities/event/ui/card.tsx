@@ -110,7 +110,7 @@ export const EventCard = ({ event }: EventCardProps) => {
           <span
             className={`px-2 py-1 rounded-full text-xs font-medium ${
               isUpcoming
-                ? "bg-primary/10 text-primary"
+                ? "bg-green-100 text-green-800 dark:bg-primary/10 dark:text-primary"
                 : "bg-muted text-muted-foreground"
             }`}
           >

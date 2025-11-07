@@ -1,9 +1,11 @@
 import { deleteEvent } from "@/actions/event";
 import { NotificationSender } from "@/components/notification_sender";
 import { Button, Separator } from "@/components/ui/base";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/ui/dialog";
+import { CreateEventDialogForm } from "@/entities/event/ui/create_dialog_form";
 import { useEvent } from "@/shared/hooks/use_event";
-import { ArrowLeft, BellRing, Trash2 } from "lucide-react";
+import { ArrowLeft, BellRing, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -13,8 +15,9 @@ interface EventHeaderProps {
 }
 
 export const EventHeader = ({ eventId }: EventHeaderProps) => {
-  const { data: event, pending } = useEvent(eventId);
+  const { data: event, pending, refresh } = useEvent(eventId);
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const navigate = useNavigate();
 
   const handleDelete = async () => {
@@ -58,8 +61,22 @@ export const EventHeader = ({ eventId }: EventHeaderProps) => {
     );
   }
 
+  const handleEditSuccess = () => {
+    refresh();
+    setShowEditDialog(false);
+  };
+
   return (
     <>
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="overflow-y-auto custom-scrollbar dialog-max-height">
+          <CreateEventDialogForm
+            defaultValues={event || undefined}
+            onSuccess={handleEditSuccess}
+          />
+        </DialogContent>
+      </Dialog>
+
       <div className="sticky top-0 bg-card/95 backdrop-blur-sm z-10 py-3 md:py-4 border-b">
         <div className="flex justify-between items-center mb-3 md:mb-4 px-3 md:px-4 gap-2">
           <div className="flex-1 min-w-0">
@@ -77,6 +94,14 @@ export const EventHeader = ({ eventId }: EventHeaderProps) => {
                 <ArrowLeft className="h-5 w-5 md:h-4 md:w-4 flex-shrink-0" />
                 <span className="hidden md:inline">Вернуться на главную</span>
               </Link>
+            </Button>
+            <Button
+              onClick={() => setShowEditDialog(true)}
+              variant="outline"
+              className="flex items-center gap-1.5 md:gap-2 px-2 md:px-3"
+            >
+              <Edit className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden md:inline">Редактировать</span>
             </Button>
             <Button
               onClick={() => setShowNotificationDialog(true)}

@@ -32,13 +32,14 @@ import {
   Tag,
   Users,
 } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { createEvent } from "../../../actions/event";
-import type { EventInsert } from "../types";
+import { createEvent, updateEvent } from "../../../actions/event";
+import type { Event, EventInsert } from "../types";
 
 interface Props {
+  defaultValues?: Partial<Event>;
   onSuccess?: () => void;
 }
 
@@ -66,11 +67,35 @@ const defaultValues: FormValues = {
   event_date: new Date(),
 };
 
-export const CreateEventDialogForm = ({ onSuccess }: Props) => {
+export const CreateEventDialogForm = ({
+  defaultValues: propsDefaultValues,
+  onSuccess,
+}: Props) => {
+  const edit = !!propsDefaultValues?.id;
+  
   const manager = useForm<FormValues>({
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      ...propsDefaultValues,
+      event_date: propsDefaultValues?.event_date
+        ? new Date(propsDefaultValues.event_date)
+        : new Date(),
+    },
   });
   const { data: locations, pending: locationsPending } = useLocations();
+
+  // Обновляем форму при изменении defaultValues
+  useEffect(() => {
+    if (propsDefaultValues) {
+      manager.reset({
+        ...defaultValues,
+        ...propsDefaultValues,
+        event_date: propsDefaultValues?.event_date
+          ? new Date(propsDefaultValues.event_date)
+          : new Date(),
+      });
+    }
+  }, [propsDefaultValues, manager]);
 
   const handleSubmit = useCallback(
     async ({ data }: { data: FormValues }) => {
@@ -87,31 +112,44 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
           event_date: data.event_date.toISOString(),
         };
 
-        const result = await createEvent(eventData);
-
-        if (result.data) {
-          toast.success("Мероприятие успешно создано");
-          manager.reset();
-          onSuccess?.();
-        } else if (result.error) {
-          toast.error(`Ошибка создания мероприятия: ${result.error.message}`);
+        if (edit && propsDefaultValues?.id) {
+          const result = await updateEvent(propsDefaultValues.id, eventData);
+          if (result.data) {
+            toast.success("Мероприятие успешно обновлено");
+            onSuccess?.();
+          } else if (result.error) {
+            toast.error(`Ошибка обновления мероприятия: ${result.error.message}`);
+          }
+        } else {
+          const result = await createEvent(eventData);
+          if (result.data) {
+            toast.success("Мероприятие успешно создано");
+            manager.reset();
+            onSuccess?.();
+          } else if (result.error) {
+            toast.error(`Ошибка создания мероприятия: ${result.error.message}`);
+          }
         }
       } catch (error) {
-        console.error("Error creating event:", error);
-        toast.error("Не удалось создать мероприятие");
+        console.error(`Error ${edit ? "updating" : "creating"} event:`, error);
+        toast.error(`Не удалось ${edit ? "обновить" : "создать"} мероприятие`);
       }
     },
-    [manager, onSuccess]
+    [manager, onSuccess, edit, propsDefaultValues]
   );
 
   return (
     <>
       <DialogHeader>
         <DialogTitle className="text-2xl font-semibold">
-          Создать мероприятие
+          {edit
+            ? `Редактировать - ${propsDefaultValues?.name || "мероприятие"}`
+            : "Создать мероприятие"}
         </DialogTitle>
         <DialogDescription className="text-muted-foreground mt-2">
-          Заполните информацию о новом мероприятии
+          {edit
+            ? "Внесите изменения в мероприятие"
+            : "Заполните информацию о новом мероприятии"}
         </DialogDescription>
       </DialogHeader>
 
@@ -279,7 +317,9 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
               Отмена
             </Button>
           </DialogClose>
-          <FormSubmitButton>Создать мероприятие</FormSubmitButton>
+          <FormSubmitButton>
+            {edit ? "Сохранить изменения" : "Создать мероприятие"}
+          </FormSubmitButton>
         </DialogFooter>
       </Form>
     </>

@@ -92,7 +92,7 @@ export const CalendarMonth = ({
         {dayNames.map((dayName) => (
           <div
             key={dayName}
-            className="text-center text-sm font-medium text-gray-500 py-2"
+            className="text-center text-xs md:text-sm font-medium text-gray-500 py-1 md:py-2"
           >
             {dayName}
           </div>
