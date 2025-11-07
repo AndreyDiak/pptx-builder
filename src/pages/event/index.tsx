@@ -14,10 +14,10 @@ export const EventPage = () => {
     return (
       <div className="w-full h-full px-2 md:px-4 overflow-y-auto custom-scrollbar">
         <div className="text-center py-12">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">
+          <h2 className="text-lg font-semibold text-foreground mb-2">
             Мероприятие не найдено
           </h2>
-          <p className="text-gray-600">Неверный ID мероприятия</p>
+          <p className="text-muted-foreground">Неверный ID мероприятия</p>
         </div>
       </div>
     );

@@ -95,8 +95,8 @@ export const EventsPage = () => {
     return (
       <LayoutMain>
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Загрузка мероприятий...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Загрузка мероприятий...</p>
         </div>
       </LayoutMain>
     );
@@ -106,11 +106,11 @@ export const EventsPage = () => {
     return (
       <LayoutMain>
         <div className="text-center py-12">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-red-800 mb-2">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6">
+            <h2 className="text-lg font-semibold text-destructive mb-2">
               Ошибка загрузки
             </h2>
-            <p className="text-red-600">{error}</p>
+            <p className="text-destructive/80">{error}</p>
           </div>
         </div>
       </LayoutMain>
@@ -127,7 +127,7 @@ export const EventsPage = () => {
       <LayoutMain>
         <LayoutHeader>
           <LayoutTitle>
-            <h2 className="text-2xl font-bold text-gray-800">Мероприятия</h2>
+            <h2 className="text-2xl font-bold text-foreground">Мероприятия</h2>
           </LayoutTitle>
           <LayoutAction>
             <Button size={size} onClick={() => setOpen(true)}>
@@ -161,21 +161,18 @@ export const EventsPage = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <div className="bg-white/80 backdrop-blur-sm rounded-lg p-8 shadow-lg">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                  <div className="bg-card/80 backdrop-blur-sm rounded-lg p-8 shadow-lg border">
+                    <h3 className="text-xl font-semibold text-foreground mb-4">
                       {(eventTypeFilter || "all") === "all"
                         ? "Пока нет мероприятий"
                         : `Нет мероприятий типа "${eventTypeFilter}"`}
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-muted-foreground mb-6">
                       {(eventTypeFilter || "all") === "all"
                         ? "Создайте первое мероприятие, чтобы начать планирование"
                         : `Создайте мероприятие типа "${eventTypeFilter}", чтобы начать планирование`}
                     </p>
-                    <Button
-                      className="bg-blue-600 hover:bg-blue-700"
-                      onClick={() => setOpen(true)}
-                    >
+                    <Button onClick={() => setOpen(true)}>
                       + Создать мероприятие
                     </Button>
                   </div>

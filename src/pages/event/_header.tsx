@@ -38,8 +38,8 @@ export const EventHeader = ({ eventId }: EventHeaderProps) => {
     return (
       <div className="mb-4 md:mb-6 px-2 md:px-4">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-8 bg-muted rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-muted rounded w-1/2"></div>
         </div>
       </div>
     );
@@ -48,10 +48,10 @@ export const EventHeader = ({ eventId }: EventHeaderProps) => {
   if (!event) {
     return (
       <div className="mb-4 md:mb-6 px-2 md:px-4">
-        <h1 className="text-lg md:text-2xl font-bold text-gray-800 mb-2">
+        <h1 className="text-lg md:text-2xl font-bold text-foreground mb-2">
           Мероприятие не найдено
         </h1>
-        <p className="text-sm md:text-base text-gray-600">
+        <p className="text-sm md:text-base text-muted-foreground">
           Проверьте правильность ссылки
         </p>
       </div>
@@ -60,10 +60,10 @@ export const EventHeader = ({ eventId }: EventHeaderProps) => {
 
   return (
     <>
-      <div className="sticky top-0 bg-white z-10 py-3 md:py-4">
+      <div className="sticky top-0 bg-card/95 backdrop-blur-sm z-10 py-3 md:py-4 border-b">
         <div className="flex justify-between items-center mb-3 md:mb-4 px-3 md:px-4 gap-2">
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg md:text-2xl font-semibold truncate">
+            <h1 className="text-lg md:text-2xl font-semibold truncate text-foreground">
               {event.name}
             </h1>
           </div>

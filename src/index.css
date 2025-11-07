@@ -78,38 +78,38 @@
 }
 
 .dark {
-  /* Темная тема - синяя палитра */
-  --background: oklch(0.1 0.02 240); /* Очень темно-синий */
-  --foreground: oklch(0.95 0.01 240); /* Светло-голубой */
-  --card: oklch(0.15 0.02 240); /* Темно-синий */
-  --card-foreground: oklch(0.95 0.01 240); /* Светло-голубой */
-  --popover: oklch(0.15 0.02 240); /* Темно-синий */
-  --popover-foreground: oklch(0.95 0.01 240); /* Светло-голубой */
-  --primary: oklch(0.7 0.15 240); /* Ярко-синий */
-  --primary-foreground: oklch(0.1 0.02 240); /* Очень темно-синий */
-  --secondary: oklch(0.2 0.02 240); /* Темно-синий */
-  --secondary-foreground: oklch(0.9 0.01 240); /* Светло-голубой */
-  --muted: oklch(0.2 0.02 240); /* Темно-синий */
-  --muted-foreground: oklch(0.6 0.02 240); /* Средне-синий */
-  --accent: oklch(0.25 0.03 240); /* Темно-синий с акцентом */
-  --accent-foreground: oklch(0.9 0.01 240); /* Светло-голубой */
+  /* Темная тема в стиле Telegram - мягкие темно-серые тона */
+  --background: oklch(0.28 0.01 240); /* Темно-серый фон (как Telegram) */
+  --foreground: oklch(0.95 0.01 240); /* Светло-серый текст (улучшенный контраст) */
+  --card: oklch(0.38 0.01 240); /* Карточка заметно светлее фона для лучшего контраста */
+  --card-foreground: oklch(0.95 0.01 240); /* Светло-серый текст */
+  --popover: oklch(0.38 0.01 240); /* Поповер как карточка */
+  --popover-foreground: oklch(0.95 0.01 240); /* Светло-серый текст */
+  --primary: oklch(0.62 0.18 240); /* Синий акцент (как Telegram) */
+  --primary-foreground: oklch(0.98 0.005 240); /* Белый текст на акценте */
+  --secondary: oklch(0.4 0.01 240); /* Вторичный цвет (светлее) */
+  --secondary-foreground: oklch(0.92 0.01 240); /* Светло-серый текст */
+  --muted: oklch(0.4 0.01 240); /* Приглушенный фон (светлее) */
+  --muted-foreground: oklch(0.7 0.01 240); /* Приглушенный текст (светлее) */
+  --accent: oklch(0.42 0.02 240); /* Акцентный фон (светлее) */
+  --accent-foreground: oklch(0.92 0.01 240); /* Светло-серый текст */
   --destructive: oklch(0.6 0.2 15); /* Красный */
-  --border: oklch(0.3 0.02 240); /* Темно-серый с синим оттенком */
-  --input: oklch(0.25 0.02 240); /* Темно-серый с синим оттенком */
-  --ring: oklch(0.7 0.15 240); /* Ярко-синий */
-  --chart-1: oklch(0.7 0.15 240); /* Синий */
-  --chart-2: oklch(0.7 0.15 180); /* Голубой */
-  --chart-3: oklch(0.7 0.15 300); /* Фиолетовый */
-  --chart-4: oklch(0.7 0.15 60); /* Желто-зеленый */
-  --chart-5: oklch(0.7 0.15 0); /* Красный */
-  --sidebar: oklch(0.12 0.02 240); /* Очень темно-синий */
-  --sidebar-foreground: oklch(0.95 0.01 240); /* Светло-голубой */
-  --sidebar-primary: oklch(0.7 0.15 240); /* Ярко-синий */
-  --sidebar-primary-foreground: oklch(0.1 0.02 240); /* Очень темно-синий */
-  --sidebar-accent: oklch(0.2 0.02 240); /* Темно-синий */
-  --sidebar-accent-foreground: oklch(0.9 0.01 240); /* Светло-голубой */
-  --sidebar-border: oklch(0.3 0.02 240); /* Темно-серый с синим оттенком */
-  --sidebar-ring: oklch(0.7 0.15 240); /* Ярко-синий */
+  --border: oklch(0.45 0.01 240); /* Граница (более заметная) */
+  --input: oklch(0.4 0.01 240); /* Поле ввода (светлее) */
+  --ring: oklch(0.62 0.18 240); /* Кольцо фокуса */
+  --chart-1: oklch(0.62 0.18 240); /* Синий */
+  --chart-2: oklch(0.62 0.18 180); /* Голубой */
+  --chart-3: oklch(0.62 0.18 300); /* Фиолетовый */
+  --chart-4: oklch(0.62 0.18 60); /* Желто-зеленый */
+  --chart-5: oklch(0.62 0.18 0); /* Красный */
+  --sidebar: oklch(0.32 0.01 240); /* Боковая панель */
+  --sidebar-foreground: oklch(0.95 0.01 240); /* Светло-серый текст */
+  --sidebar-primary: oklch(0.62 0.18 240); /* Синий акцент */
+  --sidebar-primary-foreground: oklch(0.98 0.005 240); /* Белый текст */
+  --sidebar-accent: oklch(0.4 0.01 240); /* Акцент боковой панели */
+  --sidebar-accent-foreground: oklch(0.92 0.01 240); /* Светло-серый текст */
+  --sidebar-border: oklch(0.45 0.01 240); /* Граница боковой панели */
+  --sidebar-ring: oklch(0.62 0.18 240); /* Кольцо фокуса */
 }
 
 @layer base {
@@ -167,6 +167,18 @@
   );
 }
 
+.dark .gradient-bg-rainbow {
+  background: linear-gradient(
+    135deg,
+    oklch(0.28 0.02 240) 0%,
+    oklch(0.3 0.02 280) 20%,
+    oklch(0.32 0.02 320) 40%,
+    oklch(0.34 0.02 360) 60%,
+    oklch(0.36 0.02 40) 80%,
+    oklch(0.38 0.02 80) 100%
+  );
+}
+
 .gradient-bg-ocean {
   background: linear-gradient(
     135deg,
@@ -197,6 +209,17 @@
     oklch(0.92 0.06 340) 50%,
     oklch(0.89 0.08 360) 75%,
     oklch(0.86 0.1 20) 100%
+  );
+}
+
+.dark .gradient-bg-purple {
+  background: linear-gradient(
+    135deg,
+    oklch(0.28 0.01 300) 0%,
+    oklch(0.3 0.02 320) 25%,
+    oklch(0.32 0.03 340) 50%,
+    oklch(0.34 0.04 360) 75%,
+    oklch(0.36 0.05 20) 100%
   );
 }
 

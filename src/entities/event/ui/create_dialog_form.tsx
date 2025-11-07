@@ -21,6 +21,7 @@ import {
   Input,
   Textarea,
 } from "@/components/ui/form";
+import { useLocations } from "@/shared/hooks/use_locations";
 import {
   AlignLeft,
   Calendar,
@@ -44,7 +45,7 @@ interface Props {
 interface FormValues extends Omit<EventInsert, "event_date"> {
   name: string;
   description?: string | null;
-  location?: string | null;
+  location_id?: number | null;
   host?: string | null;
   max_teams?: number | null;
   price?: number | null;
@@ -56,7 +57,7 @@ interface FormValues extends Omit<EventInsert, "event_date"> {
 const defaultValues: FormValues = {
   name: "",
   description: "",
-  location: "",
+  location_id: null,
   host: "",
   max_teams: null,
   price: null,
@@ -69,6 +70,7 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
   const manager = useForm<FormValues>({
     defaultValues,
   });
+  const { data: locations, pending: locationsPending } = useLocations();
 
   const handleSubmit = useCallback(
     async ({ data }: { data: FormValues }) => {
@@ -76,7 +78,7 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
         const eventData: EventInsert = {
           name: data.name,
           description: data.description || null,
-          location: data.location || null,
+          location_id: data.location_id || null,
           host: data.host || null,
           max_teams: data.max_teams || null,
           price: data.price || null,
@@ -186,19 +188,39 @@ export const CreateEventDialogForm = ({ onSuccess }: Props) => {
         </FormField>
 
         <FormField
-          name="location"
+          name="location_id"
           label={
             <span className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-blue-600" />
               Локация
             </span>
           }
+          useController
         >
-          <Input
-            type="text"
-            placeholder="Введите место проведения"
-            className="h-12 text-base"
-          />
+          {({ value, onChange }) => (
+            <Select
+              value={value ? String(value) : undefined}
+              onValueChange={(val) => onChange(val ? Number(val) : null)}
+              disabled={locationsPending}
+            >
+              <SelectTrigger className="w-full h-12">
+                <SelectValue placeholder="Выберите локацию" />
+              </SelectTrigger>
+              <SelectContent>
+                {locations?.map((location) => {
+                  const cityName = location.cities?.name || null;
+                  return (
+                    <SelectItem key={location.id} value={String(location.id)}>
+                      {location.name}
+                      {cityName && (
+                        <span className="text-gray-500">, {cityName}</span>
+                      )}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          )}
         </FormField>
 
         <FormField

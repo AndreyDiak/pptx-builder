@@ -42,10 +42,10 @@ export const EventRegistrations = ({
     return (
       <div className={cn("p-2 md:p-4", className)} {...props}>
         <div className="flex justify-between items-center mb-4 md:mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold text-foreground">
             Зарегистрированные команды
             {vkPending && (
-              <span className="ml-2 text-sm text-blue-600">
+              <span className="ml-2 text-sm text-primary">
                 (загрузка данных VK...)
               </span>
             )}
@@ -55,13 +55,13 @@ export const EventRegistrations = ({
           {[1, 2, 3].map((i) => (
             <Card key={i} className="animate-pulse">
               <div className="p-2 md:p-4">
-                <div className="h-6 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div className="h-6 bg-muted rounded w-1/2 mb-2"></div>
+                <div className="h-4 bg-muted rounded w-1/3 mb-4"></div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                  <div className="w-8 h-8 bg-muted rounded-full"></div>
                   <div className="flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-muted rounded w-3/4 mb-1"></div>
+                    <div className="h-3 bg-muted rounded w-1/2"></div>
                   </div>
                 </div>
               </div>
@@ -76,13 +76,13 @@ export const EventRegistrations = ({
     return (
       <div className={cn("p-2 md:p-4", className)} {...props}>
         <div className="flex justify-between items-center mb-4 md:mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold text-foreground">
             Зарегистрированные команды
           </h2>
         </div>
         <Card>
           <CardContent className="p-4 md:p-8 text-center">
-            <div className="text-red-600">
+            <div className="text-destructive">
               <h3 className="text-lg font-medium mb-2">Ошибка загрузки</h3>
               <p className="text-sm">{error}</p>
             </div>
@@ -95,7 +95,7 @@ export const EventRegistrations = ({
   return (
     <div className={cn("p-2 md:p-4", className)} {...props}>
       <div className="flex justify-between items-center mb-4 md:mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">
+        <h2 className="text-xl font-semibold text-foreground">
           Зарегистрированные команды
         </h2>
       </div>
@@ -113,11 +113,11 @@ export const EventRegistrations = ({
       ) : (
         <Card>
           <CardContent className="p-4 md:p-8 text-center">
-            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-800 mb-2">
+            <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">
               Пока нет зарегистрированных команд
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Команды появятся здесь после регистрации на мероприятие
             </p>
           </CardContent>

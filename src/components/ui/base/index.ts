@@ -6,8 +6,13 @@ export {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "./card";
+export {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "./popover";
 export {
   Select,
   SelectContent,
@@ -18,29 +23,9 @@ export {
   SelectScrollUpButton,
   SelectSeparator,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "./select";
-export { Switch } from "./switch";
-export {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "./tabs";
 export { Separator } from "./separator";
-export {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "./popover";
-export {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./tooltip";
-export { Skeleton } from "./skeleton";
-export { Toaster } from "./sonner";
 export {
   Sidebar,
   SidebarContent,
@@ -65,6 +50,22 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
-  useSidebar,
+  useSidebar
 } from "./sidebar";
+export { Skeleton } from "./skeleton";
+export { Toaster } from "./sonner";
+export { Switch } from "./switch";
+export {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "./tabs";
+export { ThemeToggle } from "./theme_toggle";
+export {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "./tooltip";
 

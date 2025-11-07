@@ -1,3 +1,4 @@
+import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/react-router/v7";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -8,11 +9,13 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <NuqsAdapter>
-        <App />
-        <Toaster />
-      </NuqsAdapter>
-    </BrowserRouter>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <BrowserRouter>
+        <NuqsAdapter>
+          <App />
+          <Toaster />
+        </NuqsAdapter>
+      </BrowserRouter>
+    </ThemeProvider>
   </StrictMode>
 );

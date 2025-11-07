@@ -110,12 +110,6 @@ export const CalendarDay = ({
                       <Clock className="h-3 w-3" />
                       {formatTime(event.event_date)}
                     </div>
-                    {event.location && (
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="h-3 w-3" />
-                        {event.location}
-                      </div>
-                    )}
                     {event.host && (
                       <div className="flex items-center gap-1.5">
                         <Mic className="h-3 w-3" />

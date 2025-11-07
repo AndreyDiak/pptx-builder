@@ -67,10 +67,10 @@ export const EventRegistrationCard = ({ registration, vkUsers }: EventRegistrati
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
-          <Users className="h-5 w-5 text-blue-600" />
+          <Users className="h-5 w-5 text-primary" />
           {registration.team_name || `Команда #${registration.id}`}
         </CardTitle>
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-muted-foreground">
           {registration.participants_count || 1} участник
           {registration.participants_count && registration.participants_count > 1
             ? "ов"
@@ -80,9 +80,9 @@ export const EventRegistrationCard = ({ registration, vkUsers }: EventRegistrati
       <CardContent className="space-y-4">
         {/* Секция капитана */}
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">Капитан</span>
+          <span className="text-sm font-medium text-foreground">Капитан</span>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden">
               <img
                 src={getVkAvatarUrl(registration.user_id)}
                 alt={getVkUserName(
@@ -98,7 +98,7 @@ export const EventRegistrationCard = ({ registration, vkUsers }: EventRegistrati
             </div>
             <button
               onClick={() => handleNicknameClick(registration.user_id)}
-              className="text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+              className="text-sm text-primary hover:text-primary/80 hover:underline cursor-pointer"
             >
               @{getVkUserNickname(registration.user_id)}
             </button>
@@ -108,20 +108,20 @@ export const EventRegistrationCard = ({ registration, vkUsers }: EventRegistrati
         {/* Дополнительная информация */}
         <div className="space-y-2">
           {registration.user_phone && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Phone className="h-4 w-4" />
               <span>{registration.user_phone}</span>
             </div>
           )}
 
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <User className="h-4 w-4" />
             <span>ID: {registration.user_id}</span>
           </div>
         </div>
 
-        <div className="pt-2 border-t border-gray-100">
-          <p className="text-xs text-gray-500">
+        <div className="pt-2 border-t border-border">
+          <p className="text-xs text-muted-foreground">
             Зарегистрирован: {formatDate(registration.registered_at)}
           </p>
         </div>
