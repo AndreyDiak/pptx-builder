@@ -31,6 +31,7 @@ import {
   Mic,
   Tag,
   Users,
+  UserPlus,
 } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -49,6 +50,7 @@ interface FormValues extends Omit<EventInsert, "event_date"> {
   location_id?: number | null;
   host?: string | null;
   max_teams?: number | null;
+  max_participants_in_team?: number | null;
   price?: number | null;
   is_active?: boolean | null;
   event_type?: "brain" | "audio" | null;
@@ -61,6 +63,7 @@ const defaultValues: FormValues = {
   location_id: null,
   host: "",
   max_teams: null,
+  max_participants_in_team: null,
   price: null,
   is_active: true,
   event_type: null,
@@ -106,6 +109,7 @@ export const CreateEventDialogForm = ({
           location_id: data.location_id ?? null,
           host: data.host ?? null,
           max_teams: data.max_teams ?? null,
+          max_participants_in_team: data.max_participants_in_team ?? null,
           price: data.price ?? null,
           is_active: data.is_active,
           event_type: data.event_type ?? null,
@@ -297,6 +301,23 @@ export const CreateEventDialogForm = ({
           <Input
             type="number"
             placeholder="Введите количество команд"
+            className="h-12 text-base"
+            min="1"
+          />
+        </FormField>
+
+        <FormField
+          name="max_participants_in_team"
+          label={
+            <span className="flex items-center gap-2">
+              <UserPlus className="h-4 w-4 text-blue-600" />
+              Максимальное количество участников в команде
+            </span>
+          }
+        >
+          <Input
+            type="number"
+            placeholder="Введите максимальное количество участников в команде"
             className="h-12 text-base"
             min="1"
           />

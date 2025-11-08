@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/base";
+import { cn } from "@/shared/utils";
 import { type VkUser } from "@/shared/hooks/use_vk_user";
-import { Phone, User, Users } from "lucide-react";
+import { AlertTriangle, Phone, User, Users } from "lucide-react";
 import { type EventRegistration } from "../types";
 
 interface EventRegistrationCardProps {
@@ -63,6 +64,8 @@ export const EventRegistrationCard = ({ registration, vkUsers }: EventRegistrati
     window.open(link, '_blank');
   };
 
+  const isApproximate = registration.approximately === true;
+
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader className="pb-3">
@@ -70,11 +73,19 @@ export const EventRegistrationCard = ({ registration, vkUsers }: EventRegistrati
           <Users className="h-5 w-5 text-primary" />
           {registration.team_name || `Команда #${registration.id}`}
         </CardTitle>
-        <div className="text-sm text-muted-foreground">
-          {registration.participants_count || 1} участник
-          {registration.participants_count && registration.participants_count > 1
-            ? "ов"
-            : ""}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+          <span>
+            {registration.participants_count || 1} участник
+            {registration.participants_count && registration.participants_count > 1
+              ? "ов"
+              : ""}
+          </span>
+          {isApproximate && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-700 dark:bg-yellow-500/30 dark:text-yellow-400 border border-yellow-500/40 dark:border-yellow-500/50">
+              <AlertTriangle className="h-3 w-3" />
+              Приблизительно
+            </span>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
