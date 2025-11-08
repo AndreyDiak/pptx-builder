@@ -46,13 +46,13 @@ export const CalendarDay = ({
 
   // Определяем цвет в зависимости от количества мероприятий
   const getEventColorClasses = () => {
-    if (!isCurrentMonth) return "bg-gray-50 border-gray-100 text-gray-400";
-    if (eventsCount === 0) return "bg-white border-gray-200 text-gray-700";
+    if (!isCurrentMonth) return "bg-muted/30 border-border/50 text-muted-foreground/50";
+    if (eventsCount === 0) return "bg-card border-border text-foreground";
     if (eventsCount === 1)
-      return "bg-green-100 border-green-300 text-green-800";
+      return "bg-primary/20 border-primary/40 text-primary dark:bg-primary/30 dark:border-primary/50";
     if (eventsCount === 2)
-      return "bg-yellow-100 border-yellow-300 text-yellow-800";
-    return "bg-red-100 border-red-300 text-red-800";
+      return "bg-accent border-accent-foreground/30 text-accent-foreground dark:bg-accent/80";
+    return "bg-destructive/20 border-destructive/40 text-destructive dark:bg-destructive/30 dark:border-destructive/50";
   };
 
   const dayContent = (
@@ -62,7 +62,7 @@ export const CalendarDay = ({
         getEventColorClasses(),
         {
           // Стили для сегодняшнего дня
-          "ring-2 ring-blue-500 ring-opacity-50": isToday,
+          "ring-2 ring-primary ring-opacity-50": isToday,
 
           // Эффекты при наведении
           "hover:scale-105 hover:shadow-md": isCurrentMonth,
@@ -73,7 +73,7 @@ export const CalendarDay = ({
       onClick={handleClick}
     >
       {isHovered && isCurrentMonth && eventsCount === 0 ? (
-        <Plus className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
+        <Plus className="w-4 h-4 md:w-5 md:h-5 text-primary" />
       ) : (
         <span className="text-xs md:text-sm font-medium">{day}</span>
       )}
@@ -87,7 +87,7 @@ export const CalendarDay = ({
         <PopoverTrigger asChild>{dayContent}</PopoverTrigger>
         <PopoverContent className="w-80" align="start">
           <div className="space-y-3">
-            <div className="font-semibold text-sm text-gray-700">
+            <div className="font-semibold text-sm text-foreground">
               {date.toLocaleDateString("ru-RU", {
                 day: "numeric",
                 month: "long",
@@ -99,13 +99,13 @@ export const CalendarDay = ({
                 <Link
                   key={event.id}
                   to={`/events/${event.id}`}
-                  className="block p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                  className="block p-3 rounded-lg border border-border hover:bg-accent transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
-                  <div className="font-medium text-sm text-gray-900 mb-1">
+                  <div className="font-medium text-sm text-foreground mb-1">
                     {event.name}
                   </div>
-                  <div className="space-y-1 text-xs text-gray-600">
+                  <div className="space-y-1 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-3 w-3" />
                       {formatTime(event.event_date)}

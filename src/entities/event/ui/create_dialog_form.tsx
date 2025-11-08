@@ -103,12 +103,12 @@ export const CreateEventDialogForm = ({
         const eventData: EventInsert = {
           name: data.name,
           description: data.description || null,
-          location_id: data.location_id || null,
-          host: data.host || null,
-          max_teams: data.max_teams || null,
-          price: data.price || null,
+          location_id: data.location_id ?? null,
+          host: data.host ?? null,
+          max_teams: data.max_teams ?? null,
+          price: data.price ?? null,
           is_active: data.is_active,
-          event_type: data.event_type || null,
+          event_type: data.event_type ?? null,
           event_date: data.event_date.toISOString(),
         };
 
@@ -195,6 +195,8 @@ export const CreateEventDialogForm = ({
               Тип мероприятия
             </span>
           }
+          required
+          errorMessage="Тип мероприятия обязателен"
           useController
         >
           {({ value, onChange }) => (
@@ -233,6 +235,8 @@ export const CreateEventDialogForm = ({
               Локация
             </span>
           }
+          required
+          errorMessage="Локация обязательна"
           useController
         >
           {({ value, onChange }) => (
@@ -269,6 +273,8 @@ export const CreateEventDialogForm = ({
               Ведущий
             </span>
           }
+          required
+          errorMessage="Ведущий обязателен"
         >
           <Input
             type="text"
@@ -285,11 +291,14 @@ export const CreateEventDialogForm = ({
               Максимальное количество команд
             </span>
           }
+          required
+          errorMessage="Количество команд обязательно"
         >
           <Input
             type="number"
             placeholder="Введите количество команд"
             className="h-12 text-base"
+            min="1"
           />
         </FormField>
 
@@ -301,6 +310,8 @@ export const CreateEventDialogForm = ({
               Стоимость участия
             </span>
           }
+          required
+          errorMessage="Стоимость обязательна"
         >
           <Input
             type="number"

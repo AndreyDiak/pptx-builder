@@ -52,21 +52,21 @@ export const CalendarPage = () => {
     return (
       <div className="w-full p-4 md:p-6 lg:p-8 flex justify-center">
         <div className="mx-auto w-7xl">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-4 md:mb-6">
             Календарь
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
             {Array.from({ length: 12 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 animate-pulse"
+                className="bg-card rounded-lg shadow-sm border border-border p-4 animate-pulse"
               >
-                <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div>
+                <div className="h-6 bg-muted rounded w-1/2 mx-auto mb-4"></div>
                 <div className="grid grid-cols-7 gap-1">
                   {Array.from({ length: 42 }).map((_, j) => (
                     <div
                       key={j}
-                      className="w-12 h-12 bg-gray-200 rounded-lg"
+                      className="w-12 h-12 bg-muted rounded-lg"
                     ></div>
                   ))}
                 </div>
@@ -82,14 +82,14 @@ export const CalendarPage = () => {
     return (
       <div className="w-full p-4 md:p-6 lg:p-8 flex justify-center">
         <div className="mx-auto w-7xl">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-4 md:mb-6">
             Календарь
           </h2>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <h3 className="text-lg font-medium text-red-800 mb-2">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6 text-center">
+            <h3 className="text-lg font-medium text-destructive mb-2">
               Ошибка загрузки
             </h3>
-            <p className="text-red-600">{error}</p>
+            <p className="text-destructive/80">{error}</p>
           </div>
         </div>
       </div>
@@ -99,7 +99,7 @@ export const CalendarPage = () => {
   return (
     <div className="w-full p-4 md:p-6 lg:p-8 flex justify-center">
       <div className="mx-auto w-7xl">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 md:mb-6">
+        <h2 className="text-2xl font-bold text-foreground mb-4 md:mb-6">
           Календарь
         </h2>
 

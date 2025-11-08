@@ -82,8 +82,8 @@ export const CalendarMonth = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+    <div className="bg-card rounded-lg shadow-sm border border-border p-4">
+      <h3 className="text-lg font-semibold text-foreground mb-4 text-center">
         {monthNames[month]} {year}
       </h3>
 
@@ -92,7 +92,7 @@ export const CalendarMonth = ({
         {dayNames.map((dayName) => (
           <div
             key={dayName}
-            className="text-center text-xs md:text-sm font-medium text-gray-500 py-1 md:py-2"
+            className="text-center text-xs md:text-sm font-medium text-muted-foreground py-1 md:py-2"
           >
             {dayName}
           </div>
